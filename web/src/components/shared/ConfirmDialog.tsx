@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { createArchiveActionClassName, createCancelActionClassName } from '@/lib/utils'
 
 type ConfirmDialogProps = {
   title: string
@@ -38,8 +39,10 @@ export function ConfirmDialog({
           {description ? <AlertDialogDescription>{description}</AlertDialogDescription> : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>{confirmText}</AlertDialogAction>
+          <AlertDialogCancel className={createCancelActionClassName()}>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction className={createArchiveActionClassName('h-12 px-5 text-sm font-semibold tracking-[0.12em]')} onClick={onConfirm}>
+            {confirmText}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -38,8 +38,8 @@ type ItemFormModalProps = {
 
 function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
   window.setTimeout(() => {
-    event.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }, 250)
+    event.currentTarget.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, 360)
 }
 
 function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
@@ -293,10 +293,10 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-2xl pb-0"
+        className="max-h-[100dvh] rounded-t-2xl overflow-hidden pb-0"
         style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
       >
-        <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
+        <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">
           <SheetTitle>{item ? 'Редактировать товар' : 'Создать товар'}</SheetTitle>
           <SheetDescription>Заполните карточку товара.</SheetDescription>
         </SheetHeader>

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useArchiveCategoryMutation, useCategoriesQuery, type CategoryRow } from '@/hooks/useCategories'
-import { createActionClassName } from '@/lib/utils'
+import { createActionClassName, createArchiveActionClassName, createEditActionClassName } from '@/lib/utils'
 
 type StatusFilter = 'active' | 'archived'
 
@@ -96,7 +96,7 @@ export function CategoriesPage() {
 
                 <div className="mt-4 grid grid-cols-2 gap-2 border-t pt-4">
                   <RoleGate permission="canEditCategory">
-                    <Button variant="outline" size="sm" onClick={() => openEditModal(category)}>
+                    <Button variant="outline" size="sm" className={createEditActionClassName()} onClick={() => openEditModal(category)}>
                       Редактировать
                     </Button>
                   </RoleGate>
@@ -107,7 +107,7 @@ export function CategoriesPage() {
                       confirmText={category.is_active ? 'Архивировать' : 'Восстановить'}
                       onConfirm={() => void archiveMutation.mutateAsync({ id: category.id, nextIsActive: !category.is_active })}
                       trigger={
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className={createArchiveActionClassName()}>
                           {category.is_active ? 'Архивировать' : 'Восстановить'}
                         </Button>
                       }
@@ -147,6 +147,7 @@ export function CategoriesPage() {
                         <Button
                           variant="outline"
                           size="sm"
+                          className={createEditActionClassName()}
                           onClick={() => openEditModal(category)}
                         >
                           <span className="hidden md:inline">Редактировать</span>
@@ -160,7 +161,7 @@ export function CategoriesPage() {
                           confirmText={category.is_active ? 'Архивировать' : 'Восстановить'}
                           onConfirm={() => void archiveMutation.mutateAsync({ id: category.id, nextIsActive: !category.is_active })}
                           trigger={
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" className={createArchiveActionClassName()}>
                               <span className="hidden md:inline">{category.is_active ? 'Архивировать' : 'Восстановить'}</span>
                               <span className="md:hidden">{category.is_active ? 'Арх.' : 'Восст.'}</span>
                             </Button>

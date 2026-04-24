@@ -19,6 +19,7 @@ import {
   useItemOperationsQuery,
   type ItemOperation,
 } from '@/hooks/useItems'
+import { createArchiveActionClassName, createEditActionClassName } from '@/lib/utils'
 
 export function ItemDetailsPage() {
   const { id } = useParams<{ id: string }>()
@@ -77,7 +78,7 @@ export function ItemDetailsPage() {
         <CardContent className="space-y-4">
           <div className="grid gap-2 sm:flex sm:flex-wrap">
             <RoleGate permission="canEditItem">
-              <Button onClick={() => setIsEditOpen(true)}>
+              <Button variant="outline" className={createEditActionClassName()} onClick={() => setIsEditOpen(true)}>
                 <Edit className="size-4" />
                 Редактировать
               </Button>
@@ -91,7 +92,7 @@ export function ItemDetailsPage() {
                     .mutateAsync({ id: item.id, nextIsActive: !item.is_active })
                     .then(() => toast.success(item.is_active ? 'Товар архивирован' : 'Товар восстановлен'))
                 }
-                trigger={<Button variant="outline">{item.is_active ? 'Архивировать' : 'Восстановить'}</Button>}
+                trigger={<Button variant="outline" className={createArchiveActionClassName()}>{item.is_active ? 'Архивировать' : 'Восстановить'}</Button>}
               />
             </RoleGate>
           </div>
@@ -286,3 +287,4 @@ function MetricTile({ label, value, tone = 'default' }: { label: string; value: 
     </div>
   )
 }
+

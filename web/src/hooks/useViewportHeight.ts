@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 
 function readViewportHeight() {
   if (typeof window === 'undefined') return 0
-  return Math.round(window.visualViewport?.height ?? window.innerHeight)
+  const visualViewport = window.visualViewport
+  if (!visualViewport) return Math.round(window.innerHeight)
+  return Math.round(visualViewport.height + visualViewport.offsetTop)
 }
 
 export function useViewportHeight(enabled = true) {

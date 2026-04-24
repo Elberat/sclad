@@ -56,6 +56,9 @@ function formatDateTime(value: string) {
   })
 }
 
+const mobileDateInputClassName =
+  'h-12 appearance-none pr-3 [color-scheme:light] [&::-webkit-date-and-time-value]:min-h-[1.5em] [&::-webkit-date-and-time-value]:text-left [&::-webkit-datetime-edit]:min-h-[1.5em]'
+
 export function HistoryPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const warehousesQuery = useWarehousesQuery()
@@ -177,8 +180,8 @@ export function HistoryPage() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Все товары" />
               </SelectTrigger>
-              <SelectContent >
-                <SelectItem value="all">Все товары</SelectItem>
+              <SelectContent className="max-h-60">
+              <SelectItem value="all">Все товары</SelectItem>
                 {(itemsQuery.data ?? [])
                   .filter((item) => item.is_active)
                   .map((item) => (
@@ -207,12 +210,12 @@ export function HistoryPage() {
 
           <div className="space-y-2">
             <Label htmlFor="date-from">Дата от</Label>
-            <Input id="date-from" type="date" value={dateFrom} onChange={(event) => updateFilter('dateFrom', event.target.value)} />
+            <Input id="date-from" type="date" className={mobileDateInputClassName} value={dateFrom} onChange={(event) => updateFilter('dateFrom', event.target.value)} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="date-to">Дата до</Label>
-            <Input id="date-to" type="date" value={dateTo} onChange={(event) => updateFilter('dateTo', event.target.value)} />
+            <Input id="date-to" type="date" className={mobileDateInputClassName} value={dateTo} onChange={(event) => updateFilter('dateTo', event.target.value)} />
           </div>
         </CardContent>
       </Card>

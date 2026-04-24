@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { useUpsertWarehouseMutation } from '@/hooks/useWarehouses'
+import { createCancelActionClassName, createSubmitActionClassName } from '@/lib/utils'
 
 const warehouseSchema = z.object({
   name: z.string().min(1, 'Название обязательно'),
@@ -29,18 +30,8 @@ type WarehouseFormModalProps = {
 
 function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
   window.setTimeout(() => {
-    event.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }, 250)
-}
-
-function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
-  if (kind === 'submit') {
-    return isCreate
-      ? 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
-      : 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
-  }
-
-  return 'h-12 rounded-md border-rose-700 bg-rose-600 px-5 text-sm font-semibold tracking-[0.14em] text-white hover:bg-rose-700'
+    event.currentTarget.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, 360)
 }
 
 export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseFormModalProps) {
@@ -76,7 +67,6 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
 
   const title = warehouse ? 'Редактировать склад' : 'Создать склад'
   const description = warehouse ? 'Измените данные склада.' : 'Заполните данные для нового склада.'
-  const isCreate = !warehouse
 
   const formBody = (
     <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
@@ -113,10 +103,10 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
 
       <div className="sticky bottom-0 mt-auto border-t bg-background/95 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-0">
         <div className="grid grid-cols-2 gap-3">
-          <Button type="button" variant="outline" className={actionButtonClassName('cancel', isCreate)} onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" className={createCancelActionClassName()} onClick={() => onOpenChange(false)}>
             Отмена
           </Button>
-          <Button type="submit" className={actionButtonClassName('submit', isCreate)} disabled={upsertWarehouse.isPending}>
+          <Button type="submit" className={createSubmitActionClassName()} disabled={upsertWarehouse.isPending}>
             {upsertWarehouse.isPending ? 'Сохраняем...' : warehouse ? 'Сохранить' : 'Создать'}
           </Button>
         </div>
@@ -142,10 +132,10 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-2xl pb-0"
+        className="max-h-[100dvh] rounded-t-2xl overflow-hidden pb-0"
         style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
       >
-        <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
+        <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
@@ -154,3 +144,5 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
     </Sheet>
   )
 }
+
+

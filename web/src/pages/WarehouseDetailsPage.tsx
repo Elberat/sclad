@@ -20,6 +20,7 @@ import {
   useWarehouseOperationsQuery,
   type WarehouseOperation,
 } from '@/hooks/useWarehouses'
+import { createArchiveActionClassName, createEditActionClassName } from '@/lib/utils'
 
 type OperationFilter = 'all' | 'receipt' | 'sale' | 'transfer'
 
@@ -78,7 +79,7 @@ export function WarehouseDetailsPage() {
           cancelText="Закрыть"
           onConfirm={() => toast.error('Нельзя архивировать склад с остатками')}
           trigger={
-            <Button variant="outline" disabled={archiveMutation.isPending}>
+            <Button variant="outline" className={createArchiveActionClassName()} disabled={archiveMutation.isPending}>
               Архивировать
             </Button>
           }
@@ -90,14 +91,14 @@ export function WarehouseDetailsPage() {
           confirmText="Архивировать"
           onConfirm={() => void handleArchiveToggle()}
           trigger={
-            <Button variant="outline" disabled={archiveMutation.isPending}>
+            <Button variant="outline" className={createArchiveActionClassName()} disabled={archiveMutation.isPending}>
               Архивировать
             </Button>
           }
         />
       )
     ) : (
-      <Button variant="outline" onClick={() => void handleArchiveToggle()} disabled={archiveMutation.isPending}>
+      <Button variant="outline" className={createArchiveActionClassName()} onClick={() => void handleArchiveToggle()} disabled={archiveMutation.isPending}>
         Восстановить
       </Button>
     )
@@ -121,7 +122,7 @@ export function WarehouseDetailsPage() {
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <RoleGate permission="canEditWarehouse">
-              <Button size="sm" onClick={() => setIsEditOpen(true)}>
+              <Button variant="outline" size="sm" className={createEditActionClassName()} onClick={() => setIsEditOpen(true)}>
                 Редактировать
               </Button>
             </RoleGate>
