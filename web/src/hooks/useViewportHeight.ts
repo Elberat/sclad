@@ -7,6 +7,11 @@ function readViewportHeight() {
   return Math.round(visualViewport.height + visualViewport.offsetTop)
 }
 
+function readViewportBottomInset() {
+  if (typeof window === 'undefined') return 0
+  return Math.max(0, Math.round(window.innerHeight - readViewportHeight()))
+}
+
 export function useViewportHeight(enabled = true) {
   const [viewportHeight, setViewportHeight] = useState(() => readViewportHeight())
 
@@ -28,4 +33,27 @@ export function useViewportHeight(enabled = true) {
   }, [enabled])
 
   return viewportHeight
+}
+
+export function useViewportBottomInset(enabled = true) {
+  const [viewportBottomInset, setViewportBottomInset] = useState(() => readViewportBottomInset())
+
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined') return
+
+    const updateViewportBottomInset = () => setViewportBottomInset(readViewportBottomInset())
+
+    updateViewportBottomInset()
+    window.addEventListener('resize', updateViewportBottomInset)
+    window.visualViewport?.addEventListener('resize', updateViewportBottomInset)
+    window.visualViewport?.addEventListener('scroll', updateViewportBottomInset)
+
+    return () => {
+      window.removeEventListener('resize', updateViewportBottomInset)
+      window.visualViewport?.removeEventListener('resize', updateViewportBottomInset)
+      window.visualViewport?.removeEventListener('scroll', updateViewportBottomInset)
+    }
+  }, [enabled])
+
+  return viewportBottomInset
 }

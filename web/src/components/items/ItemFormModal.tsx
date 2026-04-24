@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useActiveCategoriesQuery } from '@/hooks/useCategories'
 import { useUpsertItemMutation, type ItemRow } from '@/hooks/useItems'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { useViewportHeight } from '@/hooks/useViewportHeight'
+import { useViewportBottomInset, useViewportHeight } from '@/hooks/useViewportHeight'
 import { supabase } from '@/lib/supabase'
 import { createCancelActionClassName, createSubmitActionClassName } from '@/lib/utils'
 
@@ -46,6 +46,7 @@ function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
 export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const viewportHeight = useViewportHeight(open && !isDesktop)
+  const viewportBottomInset = useViewportBottomInset(open && !isDesktop)
   const categoriesQuery = useActiveCategoriesQuery()
   const upsertItem = useUpsertItemMutation()
   const itemImageKey = item?.id ?? 'new'
@@ -284,7 +285,10 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
         side="bottom"
         showCloseButton={false}
         className="w-full max-h-[100dvh] overflow-hidden rounded-t-2xl border-t pb-0"
-        style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+        style={{
+          height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+          bottom: viewportBottomInset ? `${viewportBottomInset}px` : '0px',
+        }}
       >
         <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">
           <SheetTitle>{item ? 'Редактировать товар' : 'Создать товар'}</SheetTitle>

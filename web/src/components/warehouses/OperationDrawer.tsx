@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useItemsQuery } from '@/hooks/useItems'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { useViewportHeight } from '@/hooks/useViewportHeight'
+import { useViewportBottomInset, useViewportHeight } from '@/hooks/useViewportHeight'
 import { useWarehousesQuery } from '@/hooks/useWarehouses'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -160,6 +160,7 @@ function DrawerFooter({
 export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpen, onClose }: OperationDrawerProps) {
   const isLargeScreen = useMediaQuery('(min-width: 1024px)')
   const viewportHeight = useViewportHeight(isOpen && !isLargeScreen)
+  const viewportBottomInset = useViewportBottomInset(isOpen && !isLargeScreen)
   const queryClient = useQueryClient()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const hasFixedItem = Boolean(defaultItemId)
@@ -448,7 +449,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
         side={isLargeScreen ? 'right' : 'bottom'}
         showCloseButton={false}
         className={sharedSheetContentClassName}
-        style={!isLargeScreen && viewportHeight ? { height: `${viewportHeight}px` } : undefined}
+        style={!isLargeScreen && viewportHeight ? { height: `${viewportHeight}px`, bottom: `${viewportBottomInset}px` } : undefined}
       >
         <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4 sm:p-5 lg:p-6">
           <div className="flex items-start justify-between gap-3">

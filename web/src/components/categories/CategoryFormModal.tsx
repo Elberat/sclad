@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { useViewportHeight } from '@/hooks/useViewportHeight'
+import { useViewportBottomInset, useViewportHeight } from '@/hooks/useViewportHeight'
 import { useUpsertCategoryMutation, type CategoryRow } from '@/hooks/useCategories'
 import { createCancelActionClassName, createSubmitActionClassName } from '@/lib/utils'
 
@@ -41,6 +41,7 @@ function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
 export function CategoryFormModal({ open, onOpenChange, category }: CategoryFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const viewportHeight = useViewportHeight(open && !isDesktop)
+  const viewportBottomInset = useViewportBottomInset(open && !isDesktop)
   const mutation = useUpsertCategoryMutation()
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
@@ -129,7 +130,10 @@ export function CategoryFormModal({ open, onOpenChange, category }: CategoryForm
         side="bottom"
         showCloseButton={false}
         className="w-full max-h-[100dvh] overflow-hidden rounded-t-2xl border-t pb-0"
-        style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+        style={{
+          height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+          bottom: viewportBottomInset ? `${viewportBottomInset}px` : '0px',
+        }}
       >
         <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">
           <SheetTitle>{title}</SheetTitle>
