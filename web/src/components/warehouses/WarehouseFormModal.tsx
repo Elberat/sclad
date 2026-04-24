@@ -132,7 +132,8 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="max-h-[100dvh] rounded-t-2xl overflow-hidden pb-0"
+        showCloseButton={false}
+        className="w-full max-h-[100dvh] overflow-hidden rounded-t-2xl border-t pb-0"
         style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
       >
         <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">

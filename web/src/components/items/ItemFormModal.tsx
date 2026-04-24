@@ -17,6 +17,7 @@ import { useUpsertItemMutation, type ItemRow } from '@/hooks/useItems'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { supabase } from '@/lib/supabase'
+import { createCancelActionClassName, createSubmitActionClassName } from '@/lib/utils'
 
 const itemSchema = z.object({
   name: z.string().min(1, 'Название обязательно'),
@@ -42,16 +43,6 @@ function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
   }, 360)
 }
 
-function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
-  if (kind === 'submit') {
-    return isCreate
-      ? 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
-      : 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
-  }
-
-  return 'h-12 rounded-md border-rose-700 bg-rose-600 px-5 text-sm font-semibold tracking-[0.14em] text-white hover:bg-rose-700'
-}
-
 export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const viewportHeight = useViewportHeight(open && !isDesktop)
@@ -64,8 +55,6 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
   })
   const uploadedUrl = uploadedPhoto.key === itemImageKey ? uploadedPhoto.url : item?.image_url ?? null
   const [uploading, setUploading] = useState(false)
-  const isCreate = !item
-
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemSchema),
     defaultValues: {
@@ -264,10 +253,10 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
 
       <div className="sticky bottom-0 mt-auto border-t bg-background/95 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-0">
         <div className="grid grid-cols-2 gap-3">
-          <Button type="button" variant="outline" className={actionButtonClassName('cancel', isCreate)} onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" className={createCancelActionClassName()} onClick={() => onOpenChange(false)}>
             Отмена
           </Button>
-          <Button type="submit" className={actionButtonClassName('submit', isCreate)} disabled={upsertItem.isPending || uploading}>
+          <Button type="submit" className={createSubmitActionClassName()} disabled={upsertItem.isPending || uploading}>
             {upsertItem.isPending ? 'Сохраняем...' : item ? 'Сохранить' : 'Создать'}
           </Button>
         </div>
@@ -293,7 +282,8 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="max-h-[100dvh] rounded-t-2xl overflow-hidden pb-0"
+        showCloseButton={false}
+        className="w-full max-h-[100dvh] overflow-hidden rounded-t-2xl border-t pb-0"
         style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
       >
         <SheetHeader className="shrink-0 border-b bg-background px-4 pb-4 pt-5 text-left">
