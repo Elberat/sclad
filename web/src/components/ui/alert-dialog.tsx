@@ -38,7 +38,7 @@ function AlertDialogOverlay({
         "fixed inset-0 z-40 bg-black/35 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
-      style={{ zIndex: 900, backgroundColor: 'rgba(0, 0, 0, 0.22)', ...style }}
+      style={{ zIndex: 900, backgroundColor: 'rgba(28, 23, 15, 0.32)', ...style }}
       {...props}
     />
   )
@@ -59,10 +59,10 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-6 rounded-lg border bg-background p-6 text-foreground shadow-2xl ring-1 ring-black/10 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-6 rounded-[calc(var(--radius)+0.375rem)] border border-border/80 bg-background p-6 text-foreground shadow-[var(--shadow-md)] duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
-        style={{ zIndex: 1000, backgroundColor: '#ffffff', color: '#111111', ...style }}
+        style={{ zIndex: 1000, ...style }}
         {...props}
       />
     </AlertDialogPortal>
@@ -125,7 +125,7 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
       className={cn(
-        "font-heading text-lg font-semibold tracking-wider uppercase sm:group-data-[size=default]/alert-dialog-content:group-has-data-[slot=alert-dialog-media]/alert-dialog-content:col-start-2",
+        "text-lg font-semibold tracking-tight sm:group-data-[size=default]/alert-dialog-content:group-has-data-[slot=alert-dialog-media]/alert-dialog-content:col-start-2",
         className
       )}
       {...props}

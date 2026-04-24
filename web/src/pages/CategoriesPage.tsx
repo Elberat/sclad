@@ -40,7 +40,7 @@ export function CategoriesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell">
       <PageHeader
         title="Категории"
         description="Управление категориями товаров."
@@ -83,9 +83,9 @@ export function CategoriesPage() {
         />
       ) : (
         <div data-no-pull-refresh="true">
-          <div className="grid gap-3 md:hidden">
+          <div className="mobile-list">
             {filtered.map((category) => (
-              <div key={category.id} className="rounded-md border bg-card p-4 shadow-sm">
+              <div key={category.id} className="surface-card p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="break-words font-medium leading-5">{category.name}</p>
@@ -196,11 +196,7 @@ function StatusFilterButton({ active, onClick, children }: { active: boolean; on
     <Button
       variant="outline"
       size="sm"
-      className={`min-w-[140px] flex-1 sm:flex-none ${
-        active
-          ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
-          : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
-      }`}
+      className="filter-segment"
       aria-pressed={active}
       onClick={onClick}
     >

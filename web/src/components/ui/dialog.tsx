@@ -37,13 +37,13 @@ function DialogOverlay({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
-    <DialogPrimitive.Overlay
-      data-slot="dialog-overlay"
-      className={cn(
-        "fixed inset-0 z-40 bg-black/35 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
-        className
-      )}
-      style={{ zIndex: 900, backgroundColor: 'rgba(0, 0, 0, 0.22)', ...style }}
+      <DialogPrimitive.Overlay
+        data-slot="dialog-overlay"
+        className={cn(
+          "fixed inset-0 z-40 bg-black/35 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+          className
+        )}
+      style={{ zIndex: 900, backgroundColor: 'rgba(28, 23, 15, 0.32)', ...style }}
       {...props}
     />
   )
@@ -64,10 +64,10 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-lg border bg-background p-6 text-sm text-foreground shadow-2xl ring-1 ring-black/10 duration-100 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-[calc(var(--radius)+0.375rem)] border border-border/80 bg-background p-6 text-sm text-foreground shadow-[var(--shadow-md)] duration-100 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
-        style={{ zIndex: 1000, backgroundColor: '#ffffff', color: '#111111', ...style }}
+        style={{ zIndex: 1000, ...style }}
         {...props}
       >
         {children}
@@ -75,7 +75,7 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               variant="ghost"
-              className="absolute top-4 right-4 bg-secondary"
+              className="absolute top-4 right-4"
               size="icon-sm"
             >
               <XIcon
@@ -134,7 +134,7 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-lg leading-none font-semibold tracking-wider uppercase",
+        "text-lg leading-none font-semibold tracking-tight",
         className
       )}
       {...props}

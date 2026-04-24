@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { ItemFormModal } from '@/components/items/ItemFormModal'
+import { AppLoader } from '@/components/shared/AppLoader'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { RoleGate } from '@/components/shared/RoleGate'
@@ -36,13 +37,13 @@ export function ItemDetailsPage() {
   )
 
   if (!id) return <EmptyState icon={Package} title="Товар не найден" description="Проверьте ссылку." />
-  if (itemQuery.isLoading) return <p className="text-sm text-muted-foreground">Загрузка...</p>
+  if (itemQuery.isLoading) return <AppLoader label="Загружаем карточку товара" />
   if (!itemQuery.data) return <EmptyState icon={Package} title="Товар не найден" description="Запись отсутствует или недоступна." />
 
   const item = itemQuery.data
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell">
       <Card className="overflow-visible">
         <CardHeader>
           <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-start">
@@ -107,16 +108,16 @@ export function ItemDetailsPage() {
           <EmptyState icon={Package} title="Нет остатков" description="Товар не числится ни на одном складе" />
         ) : (
           <div data-no-pull-refresh="true">
-            <div className="grid gap-3 md:hidden">
+            <div className="mobile-list">
               {(balancesQuery.data ?? []).map((balance) => (
-                <div key={balance.id} className="rounded-md border bg-card p-4 shadow-sm">
+                <div key={balance.id} className="surface-card p-5">
                   <div className="flex items-center justify-between gap-3">
                     <p className="min-w-0 break-words font-medium">{balance.warehouses?.name || '-'}</p>
                     <p className="text-lg font-semibold tabular-nums">{balance.quantity}</p>
                   </div>
                 </div>
               ))}
-              <div className="rounded-md border bg-muted/40 p-4">
+              <div className="surface-card bg-muted/40 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-semibold">Итого</p>
                   <p className="text-lg font-semibold tabular-nums">{totalQuantity} шт</p>
@@ -193,16 +194,16 @@ export function ItemDetailsPage() {
           <EmptyState icon={ReceiptText} title="Операций нет" description="Для товара пока не было движений." />
         ) : (
           <div data-no-pull-refresh="true">
-            <div className="grid gap-3 md:hidden">
+            <div className="mobile-list">
               {(operationsQuery.data ?? []).map((operation) => (
-                <div key={operation.id} className="rounded-md border bg-card p-4 shadow-sm">
+                <div key={operation.id} className="surface-card p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                       <p className="mt-2 text-xs text-muted-foreground">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Кол-во</p>
+                      <p className="stat-label">Кол-во</p>
                       <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
                     </div>
                   </div>
@@ -281,10 +282,9 @@ function quickOperationButtonClassName(type: ItemOperation['type']) {
 
 function MetricTile({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'muted' }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+    <div className="metric-tile">
+      <p className="stat-label">{label}</p>
       <p className={`mt-1 break-words text-base font-semibold tabular-nums ${tone === 'muted' ? 'text-muted-foreground' : ''}`}>{value}</p>
     </div>
   )
 }
-

@@ -13,9 +13,13 @@ export default defineConfig({
       manifest: {
         name: 'Sclad',
         short_name: 'Sclad',
-        theme_color: '#1E40AF',
-        background_color: '#FFFFFF',
+        id: '/',
+        start_url: '/',
+        scope: '/',
+        theme_color: '#0f9f6e',
+        background_color: '#f6f4ee',
         display: 'standalone',
+        orientation: 'portrait',
         icons: [
           { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },

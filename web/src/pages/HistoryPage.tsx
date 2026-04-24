@@ -4,6 +4,7 @@ import { ReceiptText } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { EmptyState } from '@/components/shared/EmptyState'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { TableSkeleton } from '@/components/shared/TableSkeleton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -133,11 +134,8 @@ export function HistoryPage() {
   const resetFilters = () => setSearchParams(new URLSearchParams())
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">История</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Журнал операций по складу с фильтрацией и пагинацией.</p>
-      </div>
+    <div className="page-shell">
+      <PageHeader title="История" description="Журнал операций по складу с фильтрацией и пагинацией." />
 
       <Card size="sm">
         <CardHeader className="gap-3">
@@ -237,9 +235,9 @@ export function HistoryPage() {
         />
       ) : (
         <div data-no-pull-refresh="true">
-          <div className="grid gap-3 md:hidden">
+          <div className="mobile-list">
             {(operationsQuery.data?.rows ?? []).map((operation) => (
-              <div key={operation.id} className="rounded-md border bg-card p-4 shadow-sm">
+              <div key={operation.id} className="surface-card p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
@@ -251,7 +249,7 @@ export function HistoryPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Кол-во</p>
+                    <p className="stat-label">Кол-во</p>
                     <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
                   </div>
                 </div>

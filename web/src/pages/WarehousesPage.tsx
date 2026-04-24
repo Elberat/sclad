@@ -31,7 +31,7 @@ export function WarehousesPage() {
   }, [filterMode, warehousesQuery.data])
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell">
       <PageHeader
         title="Склады"
         description="Список складов и остатки по позициям."
@@ -94,11 +94,7 @@ function SegmentButton({ active, onClick, children }: { active: boolean; onClick
       variant="outline"
       size="sm"
       className={
-        (
-          active
-            ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
-            : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
-        ) + ' min-w-[128px] flex-1 sm:flex-none'
+        'filter-segment'
       }
       aria-pressed={active}
       onClick={onClick}
@@ -115,9 +111,9 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
 function WarehousesTable({ warehouses }: { warehouses: WarehouseWithCount[] }) {
   return (
     <div data-no-pull-refresh="true">
-      <div className="grid gap-3 md:hidden">
+      <div className="mobile-list">
         {warehouses.map((warehouse) => (
-          <Link key={warehouse.id} to={`/warehouses/${warehouse.id}`} className="block rounded-md border bg-card p-4 shadow-sm active:bg-muted/60">
+          <Link key={warehouse.id} to={`/warehouses/${warehouse.id}`} className="surface-card-interactive block p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="break-words font-medium leading-5">{warehouse.name}</p>
@@ -126,7 +122,7 @@ function WarehousesTable({ warehouses }: { warehouses: WarehouseWithCount[] }) {
               <StatusBadge isActive={warehouse.is_active} />
             </div>
             <div className="mt-4 flex items-center justify-between border-t pt-3">
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Позиций</span>
+              <span className="stat-label">Позиций</span>
               <span className="text-lg font-semibold tabular-nums">{warehouse.itemsCount}</span>
             </div>
           </Link>

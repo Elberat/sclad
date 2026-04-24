@@ -10,7 +10,7 @@ export function TableSkeleton({ rows = 5, columns = 5 }: TableSkeletonProps) {
     <>
       <div className="grid gap-3 md:hidden">
         {Array.from({ length: Math.min(rows, 4) }).map((_, rowIndex) => (
-          <div key={rowIndex} className="rounded-md border p-4">
+          <div key={rowIndex} className="surface-card p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-3/4" />
@@ -24,11 +24,11 @@ export function TableSkeleton({ rows = 5, columns = 5 }: TableSkeletonProps) {
       </div>
 
       <div className="hidden space-y-3 md:block">
-        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-12 w-full rounded-xl" />
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div key={rowIndex} className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
             {Array.from({ length: columns }).map((_, colIndex) => (
-              <Skeleton key={`${rowIndex}-${colIndex}`} className="h-8 w-full" />
+              <Skeleton key={`${rowIndex}-${colIndex}`} className="h-9 w-full rounded-xl" />
             ))}
           </div>
         ))}

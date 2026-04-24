@@ -139,7 +139,7 @@ export function UsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell">
       <PageHeader
         title="Пользователи"
         description="Управление аккаунтами, ролями и доступом."
@@ -409,7 +409,7 @@ function CredentialsDialog({ credentials, onOpenChange }: { credentials: Created
           <DialogTitle>Данные для передачи</DialogTitle>
           <DialogDescription>Пароль больше нигде не покажется.</DialogDescription>
         </DialogHeader>
-        <div className="rounded-md border bg-muted/40 p-4 font-mono text-sm whitespace-pre-wrap">{text}</div>
+        <div className="surface-card bg-muted/40 p-4 font-mono text-sm whitespace-pre-wrap">{text}</div>
         <DialogFooter>
           <Button onClick={() => void copy()}>
             <Copy className="size-4" />

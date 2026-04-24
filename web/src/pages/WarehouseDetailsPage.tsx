@@ -104,13 +104,13 @@ export function WarehouseDetailsPage() {
     )
 
   return (
-    <div className="space-y-5">
+    <div className="page-shell">
       {warehouseQuery.isLoading ? (
         <TableSkeleton columns={2} rows={2} />
       ) : warehouseQuery.isError || !warehouseQuery.data ? (
         <EmptyState icon={Building2} title="Склад не найден" description="Возможно, он был удалён или недоступен." />
       ) : (
-        <div className="rounded-md border p-4">
+        <div className="surface-card p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="break-words text-2xl font-semibold tracking-tight">{warehouseQuery.data.name}</h1>
@@ -167,12 +167,12 @@ export function WarehouseDetailsPage() {
           />
         ) : (
           <div data-no-pull-refresh="true">
-            <div className="grid gap-3 md:hidden">
+            <div className="mobile-list">
               {filteredItems.map((balance) => (
                 <Link
                   key={balance.id}
                   to={balance.items?.id ? `/items/${balance.items.id}` : '/items'}
-                  className="block rounded-md border bg-card p-4 shadow-sm active:bg-muted/60"
+                  className="surface-card-interactive block p-5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -184,7 +184,7 @@ export function WarehouseDetailsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Остаток</p>
+                      <p className="stat-label">Остаток</p>
                       <p className="text-lg font-semibold tabular-nums">{balance.quantity}</p>
                     </div>
                   </div>
@@ -346,9 +346,9 @@ function quickOperationButtonClassName(type: WarehouseOperation['type']) {
 function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
   return (
     <div data-no-pull-refresh="true">
-      <div className="grid gap-3 md:hidden">
+      <div className="mobile-list">
         {operations.map((operation) => (
-          <div key={operation.id} className="rounded-md border bg-card p-4 shadow-sm">
+          <div key={operation.id} className="surface-card p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
@@ -356,7 +356,7 @@ function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
                 <p className="mt-1 text-xs text-muted-foreground">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Кол-во</p>
+                <p className="stat-label">Кол-во</p>
                 <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
               </div>
             </div>

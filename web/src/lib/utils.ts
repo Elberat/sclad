@@ -7,35 +7,35 @@ export function cn(...inputs: ClassValue[]) {
 
 export function createActionClassName(className?: ClassValue) {
   return cn(
-    'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100 hover:text-amber-950',
+    'border-teal-200 bg-teal-50 text-teal-800 hover:border-teal-300 hover:bg-teal-100 hover:text-teal-900',
     className,
   )
 }
 
 export function createEditActionClassName(className?: ClassValue) {
   return cn(
-    'gap-2 border-blue-200 bg-blue-50 text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-100 hover:text-blue-800',
+    'gap-2 border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100 hover:text-sky-800',
     className,
   )
 }
 
 export function createArchiveActionClassName(className?: ClassValue) {
   return cn(
-    'gap-2 border-rose-200 bg-rose-50 text-rose-700 shadow-sm hover:border-rose-300 hover:bg-rose-100 hover:text-rose-800',
+    'gap-2 border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100 hover:text-rose-800',
     className,
   )
 }
 
 export function createCancelActionClassName(className?: ClassValue) {
   return cn(
-    'h-12 rounded-md border-slate-300 bg-slate-100 px-5 text-sm font-semibold tracking-[0.12em] text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-200 hover:text-slate-900',
+    'h-12 rounded-xl border-border bg-secondary px-5 text-sm font-medium tracking-normal text-secondary-foreground hover:border-border hover:bg-muted hover:text-foreground',
     className,
   )
 }
 
 export function createSubmitActionClassName(className?: ClassValue) {
   return cn(
-    'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.14em] text-white shadow-sm hover:bg-emerald-700',
+    'h-12 rounded-xl border-emerald-700 bg-emerald-600 px-5 text-sm font-medium tracking-normal text-white hover:border-emerald-800 hover:bg-emerald-700',
     className,
   )
 }

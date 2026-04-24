@@ -40,7 +40,7 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className={createCancelActionClassName()}>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction className={createArchiveActionClassName('h-12 px-5 text-sm font-semibold tracking-[0.12em]')} onClick={onConfirm}>
+          <AlertDialogAction className={createArchiveActionClassName('h-12 px-5 text-sm font-medium tracking-normal')} onClick={onConfirm}>
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

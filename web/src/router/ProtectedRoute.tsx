@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
+import { AppLoader } from '@/components/shared/AppLoader'
 import { useAuth } from '@/contexts/AuthContext'
 
 export function ProtectedRoute() {
@@ -7,7 +8,7 @@ export function ProtectedRoute() {
   const location = useLocation()
 
   if (isLoading) {
-    return <div className="p-6 text-sm text-muted-foreground">Загрузка...</div>
+    return <AppLoader fullScreen label="Подготавливаем рабочее пространство" />
   }
 
   if (!user) {

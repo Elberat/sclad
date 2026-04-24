@@ -66,7 +66,7 @@ export function ItemsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell">
       <PageHeader
         title="Товары"
         description="Номенклатура и остатки."
@@ -196,14 +196,14 @@ export function ItemsPage() {
         />
       ) : (
         <div data-no-pull-refresh="true">
-          <div className="grid gap-3 md:hidden">
+          <div className="mobile-list">
             {filteredItems.map((item) => (
-              <Link key={item.id} to={`/items/${item.id}`} className="block rounded-md border bg-card p-4 shadow-sm active:bg-muted/60">
+              <Link key={item.id} to={`/items/${item.id}`} className="surface-card-interactive block p-5">
                 <div className="flex items-start gap-3">
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.name} className="h-14 w-14 shrink-0 rounded-md object-cover" />
+                    <img src={item.image_url} alt={item.name} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
                   ) : (
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                       <Package2 className="h-6 w-6" />
                     </div>
                   )}
@@ -220,7 +220,7 @@ export function ItemsPage() {
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t pt-3">
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Остаток</span>
+                  <span className="stat-label">Остаток</span>
                   <span className="text-lg font-semibold tabular-nums">{item.total_quantity}</span>
                 </div>
               </Link>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Boxes, Building2, History, LayoutDashboard, Package, Users } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 
+import { InstallAppButton } from '@/components/shared/InstallAppButton'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { PERMISSIONS } from '@/lib/permissions'
@@ -28,11 +29,15 @@ function NavItemLink({ item, mobile }: { item: NavItem; mobile?: boolean }) {
       to={item.path}
       className={({ isActive }) =>
         mobile
-          ? `relative flex min-h-[60px] min-w-0 flex-col items-center justify-center gap-1 border-t-2 px-1 text-[11px] transition-colors ${
-              isActive ? 'border-primary bg-muted text-primary' : 'border-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+          ? `relative flex min-h-[60px] min-w-0 flex-col items-center justify-center gap-1 border-t-2 px-1 text-[11px] transition-all duration-200 ease-out active:scale-[0.98] ${
+              isActive
+                ? 'border-primary bg-accent text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]'
+                : 'border-transparent text-muted-foreground hover:-translate-y-0.5 hover:bg-accent/60 hover:text-foreground'
             }`
-          : `flex min-h-[44px] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors ${
-              isActive ? 'border-primary/20 bg-primary/10 text-primary shadow-sm' : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground'
+          : `flex min-h-[44px] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all duration-200 ease-out active:scale-[0.99] ${
+              isActive
+                ? 'border-primary/20 bg-primary/10 text-primary shadow-[var(--shadow-sm)]'
+                : 'border-transparent text-muted-foreground hover:-translate-y-0.5 hover:bg-accent hover:text-foreground hover:shadow-[var(--shadow-sm)]'
             }`
       }
     >
@@ -55,18 +60,19 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
-      <aside className="hidden border-r bg-card md:flex md:flex-col">
-        <div className="border-b px-5 py-4 text-base font-semibold">Sclad</div>
+      <aside className="hidden border-r border-border/80 bg-card md:flex md:flex-col">
+        <div className="border-b border-border/80 px-5 py-4 text-base font-semibold tracking-tight">Sclad</div>
         <nav className="flex-1 space-y-1.5 px-3 py-4">
           {permittedNavItems.map((item) => (
             <NavItemLink key={item.path} item={item} />
           ))}
         </nav>
-        <div className="space-y-3 border-t px-4 py-4">
+        <div className="space-y-3 border-t border-border/80 px-4 py-4">
           <div className="text-sm">
             <p className="font-medium">{profile?.full_name || profile?.email || 'Пользователь'}</p>
             <p className="text-xs text-muted-foreground">{profile?.role}</p>
           </div>
+          <InstallAppButton variant="outline" className="w-full" compact />
           <Button variant="outline" className="w-full" onClick={handleSignOut}>
             Выйти
           </Button>

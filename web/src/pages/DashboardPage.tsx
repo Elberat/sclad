@@ -15,6 +15,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom'
 
 import { EmptyState } from '@/components/shared/EmptyState'
+import { InstallAppButton } from '@/components/shared/InstallAppButton'
 import { RoleGate } from '@/components/shared/RoleGate'
 import { TableSkeleton } from '@/components/shared/TableSkeleton'
 import { Badge } from '@/components/ui/badge'
@@ -115,12 +116,12 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 xl:gap-6">
+    <div className="page-shell gap-5 xl:gap-6">
       <div className="flex items-start justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Дашборд</h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-input bg-background text-foreground shadow-sm transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20">
+          <DropdownMenuTrigger className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-input bg-background text-foreground shadow-[var(--shadow-sm)] transition-colors outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20">
             <EllipsisVertical className="h-4 w-4" />
             <span className="sr-only">Открыть меню пользователя</span>
           </DropdownMenuTrigger>
@@ -132,6 +133,7 @@ export function DashboardPage() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <InstallAppButton variant="ghost" className="w-full justify-start rounded-lg px-3" compact />
             {canManageUsers ? (
               <DropdownMenuItem onClick={() => navigate('/users')} className="normal-case text-sm tracking-normal">
                 <Users className="h-4 w-4" />
@@ -146,7 +148,7 @@ export function DashboardPage() {
         </DropdownMenu>
       </div>
 
-      <section className="grid overflow-hidden rounded-md border min-[360px]:grid-cols-2 xl:grid-cols-4">
+      <section className="surface-card grid overflow-hidden min-[360px]:grid-cols-2 xl:grid-cols-4">
         <MetricStat title="Склады" value={dashboardQuery.data?.activeWarehouses ?? 0} icon={Building2} />
         <MetricStat title="Товары" value={dashboardQuery.data?.activeItems ?? 0} icon={Package} />
         <MetricStat title="Категории" value={dashboardQuery.data?.activeCategories ?? 0} icon={Boxes} />
@@ -238,7 +240,7 @@ export function DashboardPage() {
 
 function OperationCard({ operation }: { operation: DashboardOperation }) {
   return (
-    <div className="rounded-md border bg-card p-4 shadow-sm sm:p-5">
+    <div className="surface-card p-5">
       <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
         <div className="min-w-0">
           <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
@@ -250,7 +252,7 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
           </p>
         </div>
         <div className="min-[420px]:text-right">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Кол-во</p>
+          <p className="stat-label">Кол-во</p>
           <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
         </div>
       </div>
@@ -316,12 +318,12 @@ function MetricStat({
   icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 border-b px-3 py-3 last:border-b-0 min-[360px]:border-r min-[360px]:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(4)]:border-r-0">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground sm:h-10 sm:w-10">
+    <div className="flex min-w-0 items-center gap-3 border-b border-border/80 px-4 py-4 last:border-b-0 min-[360px]:border-r min-[360px]:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(4)]:border-r-0">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">
-        <p className="truncate text-xs text-muted-foreground">{title}</p>
+        <p className="truncate text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
         <p className="text-lg font-semibold leading-6 tabular-nums sm:text-xl">
           {value}
           {suffix ? ` ${suffix}` : ''}
