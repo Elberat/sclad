@@ -46,6 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
   const permittedNavItems = NAV_ITEMS.filter((item) => (profile ? PERMISSIONS[profile.role]?.[item.permission] : false))
+  const mobileNavItems = permittedNavItems.filter((item) => item.path !== '/users')
 
   const handleSignOut = async () => {
     await signOut()
@@ -77,9 +78,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden">
         <div
           className="grid h-[60px] items-stretch pb-[env(safe-area-inset-bottom)]"
-          style={{ gridTemplateColumns: `repeat(${Math.max(permittedNavItems.length, 1)}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${Math.max(mobileNavItems.length, 1)}, minmax(0, 1fr))` }}
         >
-          {permittedNavItems.map((item) => (
+          {mobileNavItems.map((item) => (
             <NavItemLink key={item.path} item={item} mobile />
           ))}
         </div>

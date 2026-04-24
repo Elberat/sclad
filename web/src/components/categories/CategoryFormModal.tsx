@@ -26,6 +26,22 @@ type CategoryFormModalProps = {
   category?: CategoryRow | null
 }
 
+function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
+  window.setTimeout(() => {
+    event.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, 250)
+}
+
+function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
+  if (kind === 'submit') {
+    return isCreate
+      ? 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
+      : 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
+  }
+
+  return 'h-12 rounded-md border-rose-700 bg-rose-600 px-5 text-sm font-semibold tracking-[0.14em] text-white hover:bg-rose-700'
+}
+
 export function CategoryFormModal({ open, onOpenChange, category }: CategoryFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const mutation = useUpsertCategoryMutation()
@@ -50,27 +66,49 @@ export function CategoryFormModal({ open, onOpenChange, category }: CategoryForm
 
   const title = category ? 'Редактировать категорию' : 'Создать категорию'
   const description = category ? 'Обновите параметры категории.' : 'Добавьте новую категорию товаров.'
+  const isCreate = !category
 
   const body = (
-    <form className="flex min-h-0 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+    <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 pb-6 pt-1 sm:px-0">
         <div className="space-y-2">
           <Label htmlFor="category-name">Название</Label>
-          <Input id="category-name" placeholder="Например, Кондиционеры" {...form.register('name')} />
-          {form.formState.errors.name ? <p className="text-xs text-destructive">{form.formState.errors.name.message}</p> : null}
+          <Input
+            id="category-name"
+            placeholder="Например, Кондиционеры"
+            enterKeyHint="next"
+            {...form.register('name')}
+            onFocus={scrollFieldIntoView}
+          />
+          {form.formState.errors.name ? (
+            <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+              {form.formState.errors.name.message}
+            </p>
+          ) : null}
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="category-description">Описание</Label>
-          <Textarea id="category-description" rows={4} placeholder="Короткое описание для команды" {...form.register('description')} />
+          <Textarea
+            id="category-description"
+            rows={5}
+            placeholder="Короткое описание для команды"
+            enterKeyHint="done"
+            {...form.register('description')}
+            onFocus={scrollFieldIntoView}
+          />
         </div>
       </div>
-      <div className="mt-4 grid shrink-0 grid-cols-2 gap-2 border-t bg-background pt-4">
-        <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-          Отмена
-        </Button>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? 'Сохраняем...' : 'Сохранить'}
-        </Button>
+
+      <div className="sticky bottom-0 mt-auto border-t bg-background/95 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-0">
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="outline" type="button" className={actionButtonClassName('cancel', isCreate)} onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit" className={actionButtonClassName('submit', isCreate)} disabled={mutation.isPending}>
+            {mutation.isPending ? 'Сохраняем...' : category ? 'Сохранить' : 'Создать'}
+          </Button>
+        </div>
       </div>
     </form>
   )
@@ -78,12 +116,12 @@ export function CategoryFormModal({ open, onOpenChange, category }: CategoryForm
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="grid max-h-[90dvh] max-w-xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
+          <DialogHeader className="pr-10">
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <div className="mt-2">{body}</div>
+          {body}
         </DialogContent>
       </Dialog>
     )
@@ -91,12 +129,12 @@ export function CategoryFormModal({ open, onOpenChange, category }: CategoryForm
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90dvh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <SheetHeader className="border-b pb-4">
+      <SheetContent side="bottom" className="h-[100dvh] rounded-t-2xl pb-0">
+        <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
-        <div className="mt-4 flex min-h-0 flex-1 flex-col">{body}</div>
+        <div className="flex min-h-0 flex-1 flex-col px-4 pt-4">{body}</div>
       </SheetContent>
     </Sheet>
   )

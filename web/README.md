@@ -1,73 +1,32 @@
-# React + TypeScript + Vite
+# Sclad Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Env modes
 
-Currently, two official plugins are available:
+The app reads frontend Supabase config from Vite env vars:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_APP_ENV` optional marker for the current target
 
-## React Compiler
+Recommended local setup:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Create `web/.env.development.local` from `web/.env.development.example`
+2. Create `web/.env.production.local` from `web/.env.production.example`
+3. Put your dev Supabase project in the development file
+4. Put your prod Supabase project in the production file
 
-## Expanding the ESLint configuration
+`*.local` files are ignored by git, so personal credentials stay local.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Commands
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- `npm run dev` or `npm run dev:dev` starts Vite against the dev env
+- `npm run dev:prod` starts Vite against the prod env
+- `npm run build` or `npm run build:prod` builds with the prod env
+- `npm run build:dev` builds with the dev env
+- `npm run preview:prod` previews a prod build
+- `npm run preview:dev` previews a dev build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Notes
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Do not put `SUPABASE_SERVICE_ROLE_KEY` into frontend env files
+- Only `VITE_*` variables are exposed to the browser bundle

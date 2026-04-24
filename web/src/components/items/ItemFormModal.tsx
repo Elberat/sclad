@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Upload } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -12,9 +12,9 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useActiveCategoriesQuery } from '@/hooks/useCategories'
 import { useUpsertItemMutation, type ItemRow } from '@/hooks/useItems'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { supabase } from '@/lib/supabase'
 
 const itemSchema = z.object({
@@ -35,6 +35,22 @@ type ItemFormModalProps = {
   item?: ItemRow | null
 }
 
+function scrollFieldIntoView(event: React.FocusEvent<HTMLElement>) {
+  window.setTimeout(() => {
+    event.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, 250)
+}
+
+function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
+  if (kind === 'submit') {
+    return isCreate
+      ? 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
+      : 'h-12 rounded-md border-emerald-700 bg-emerald-600 px-5 text-sm font-semibold tracking-[0.18em] text-white hover:bg-emerald-700'
+  }
+
+  return 'h-12 rounded-md border-rose-700 bg-rose-600 px-5 text-sm font-semibold tracking-[0.14em] text-white hover:bg-rose-700'
+}
+
 export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const categoriesQuery = useActiveCategoriesQuery()
@@ -46,6 +62,7 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
   })
   const uploadedUrl = uploadedPhoto.key === itemImageKey ? uploadedPhoto.url : item?.image_url ?? null
   const [uploading, setUploading] = useState(false)
+  const isCreate = !item
 
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemSchema),
@@ -70,7 +87,11 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
       purchase_price: item?.purchase_price ?? '',
       sale_price: item?.sale_price ?? '',
     })
-  }, [form, item, open])
+    setUploadedPhoto({
+      key: itemImageKey,
+      url: item?.image_url ?? null,
+    })
+  }, [form, item, itemImageKey, open])
 
   const uploadPhoto = async (file: File) => {
     setUploading(true)
@@ -125,110 +146,129 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
   }
 
   const body = (
-    <form className="flex min-h-0 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="item-name">Название</Label>
-          <Input id="item-name" {...form.register('name')} />
-          {form.formState.errors.name ? <p className="text-xs text-destructive">{form.formState.errors.name.message}</p> : null}
+    <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 pb-6 pt-1 sm:px-0">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="item-name">Название</Label>
+            <Input
+              id="item-name"
+              enterKeyHint="next"
+              autoComplete="off"
+              {...form.register('name')}
+              onFocus={scrollFieldIntoView}
+            />
+            {form.formState.errors.name ? (
+              <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Категория</Label>
+            <Controller
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="h-11 w-full text-base" onFocus={scrollFieldIntoView}>
+                    <SelectValue placeholder="Выберите категорию" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(categoriesQuery.data ?? []).map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {form.formState.errors.category_id ? (
+              <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+                {form.formState.errors.category_id.message}
+              </p>
+            ) : null}
+          </div>
         </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="item-model">Модель</Label>
+            <Input id="item-model" enterKeyHint="next" {...form.register('model')} onFocus={scrollFieldIntoView} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="item-sku">SKU</Label>
+            <Input id="item-sku" enterKeyHint="next" {...form.register('sku')} onFocus={scrollFieldIntoView} />
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <Label>Категория</Label>
-          <Controller
-            control={form.control}
-            name="category_id"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Выберите категорию" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(categoriesQuery.data ?? []).map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+          <Label htmlFor="item-description">Описание</Label>
+          <Textarea id="item-description" rows={4} {...form.register('description')} onFocus={scrollFieldIntoView} />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="item-purchase-price">Закупочная цена</Label>
+            <Input id="item-purchase-price" inputMode="decimal" enterKeyHint="next" {...form.register('purchase_price')} onFocus={scrollFieldIntoView} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="item-sale-price">Цена продажи</Label>
+            <Input id="item-sale-price" inputMode="decimal" enterKeyHint="done" {...form.register('sale_price')} onFocus={scrollFieldIntoView} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Фото</Label>
+          <label
+            htmlFor="item-photo-input"
+            className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border p-4 text-center transition-colors hover:border-foreground/40 hover:bg-muted/30"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault()
+              const file = event.dataTransfer.files?.[0]
+              if (file) void uploadPhoto(file)
+            }}
+          >
+            <Upload className="size-5 text-muted-foreground" />
+            <span className="max-w-[16rem] text-sm text-muted-foreground">
+              {uploading ? 'Загрузка...' : 'Перетащите фото или нажмите для выбора'}
+            </span>
+          </label>
+
+          <Input
+            id="item-photo-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0]
+              if (file) void uploadPhoto(file)
+            }}
           />
-          {form.formState.errors.category_id ? (
-            <p className="text-xs text-destructive">{form.formState.errors.category_id.message}</p>
+
+          {uploadedUrl ? (
+            <div className="space-y-2">
+              <img src={uploadedUrl} alt="Фото товара" className="h-32 w-32 rounded-md object-cover" />
+              <Button type="button" variant="outline" size="sm" className="rounded-md" onClick={() => setUploadedPhoto({ key: itemImageKey, url: null })}>
+                Удалить фото
+              </Button>
+            </div>
           ) : null}
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="item-model">Модель</Label>
-          <Input id="item-model" {...form.register('model')} />
+      <div className="sticky bottom-0 mt-auto border-t bg-background/95 px-1 pt-4 pb-[calc(0.25rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-0">
+        <div className="grid grid-cols-2 gap-3">
+          <Button type="button" variant="outline" className={actionButtonClassName('cancel', isCreate)} onClick={() => onOpenChange(false)}>
+            Отмена
+          </Button>
+          <Button type="submit" className={actionButtonClassName('submit', isCreate)} disabled={upsertItem.isPending || uploading}>
+            {upsertItem.isPending ? 'Сохраняем...' : item ? 'Сохранить' : 'Создать'}
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="item-sku">SKU</Label>
-          <Input id="item-sku" {...form.register('sku')} />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="item-description">Описание</Label>
-        <Textarea id="item-description" rows={3} {...form.register('description')} />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="item-purchase-price">Закупочная цена</Label>
-          <Input id="item-purchase-price" {...form.register('purchase_price')} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="item-sale-price">Цена продажи</Label>
-          <Input id="item-sale-price" {...form.register('sale_price')} />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Фото</Label>
-        <label
-          htmlFor="item-photo-input"
-          className="flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 border border-dashed p-4 text-center"
-          onDragOver={(event) => event.preventDefault()}
-          onDrop={(event) => {
-            event.preventDefault()
-            const file = event.dataTransfer.files?.[0]
-            if (file) void uploadPhoto(file)
-          }}
-        >
-          <Upload className="size-5 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">{uploading ? 'Загрузка...' : 'Перетащите фото или нажмите для выбора'}</span>
-        </label>
-        <Input
-          id="item-photo-input"
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            if (file) void uploadPhoto(file)
-          }}
-        />
-        {uploadedUrl ? (
-          <div className="space-y-2">
-            <img src={uploadedUrl} alt="Фото товара" className="h-32 w-32 rounded-md object-cover" />
-            <Button type="button" variant="outline" size="sm" onClick={() => setUploadedPhoto({ key: itemImageKey, url: null })}>
-              Удалить фото
-            </Button>
-          </div>
-        ) : null}
-      </div>
-      </div>
-
-      <div className="mt-4 flex shrink-0 justify-end gap-2 border-t bg-background pt-4">
-        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-          Отмена
-        </Button>
-        <Button type="submit" disabled={upsertItem.isPending || uploading}>
-          {upsertItem.isPending ? 'Сохраняем...' : 'Сохранить'}
-        </Button>
       </div>
     </form>
   )
@@ -249,12 +289,12 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90dvh] rounded-t-2xl pb-8">
-        <SheetHeader className="shrink-0">
+      <SheetContent side="bottom" className="h-[100dvh] rounded-t-2xl pb-0">
+        <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
           <SheetTitle>{item ? 'Редактировать товар' : 'Создать товар'}</SheetTitle>
           <SheetDescription>Заполните карточку товара.</SheetDescription>
         </SheetHeader>
-        <div className="min-h-0 flex-1 px-8">{body}</div>
+        <div className="flex min-h-0 flex-1 flex-col px-4 pt-4">{body}</div>
       </SheetContent>
     </Sheet>
   )

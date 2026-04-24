@@ -4,10 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "vite --mode development",
+    "dev:dev": "vite --mode development",
+    "dev:prod": "vite --mode production",
+    "build": "tsc -b && vite build --mode production",
+    "build:dev": "tsc -b && vite build --mode development",
+    "build:prod": "tsc -b && vite build --mode production",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:dev": "npm run build:dev && vite preview",
+    "preview:prod": "npm run build:prod && vite preview"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans": "^5.2.10",

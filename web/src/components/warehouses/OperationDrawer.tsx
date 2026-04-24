@@ -129,7 +129,7 @@ function ItemCombobox({
 }
 
 export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpen, onClose }: OperationDrawerProps) {
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const isLargeScreen = useMediaQuery('(min-width: 1024px)')
   const queryClient = useQueryClient()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const hasFixedItem = Boolean(defaultItemId)
@@ -335,9 +335,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
       ['dashboard'],
     ]
 
-    await Promise.all(
-      affectedQueryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey, refetchType: 'none' })),
-    )
+    await Promise.all(affectedQueryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey, refetchType: 'none' })))
     await Promise.all(affectedQueryKeys.map((queryKey) => queryClient.refetchQueries({ queryKey, type: 'active' })))
   }
 
@@ -410,14 +408,16 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
     }
   })
 
-  const sharedSheetContentClassName = isDesktop ? 'w-[480px] max-w-[480px]' : 'h-[100dvh] w-full pb-[env(safe-area-inset-bottom)]'
+  const sharedSheetContentClassName = isLargeScreen
+    ? 'h-[100dvh] w-[min(560px,100vw)] max-w-[560px]'
+    : 'h-[min(100dvh,920px)] w-full rounded-t-2xl border-t pb-[env(safe-area-inset-bottom)] sm:h-[88dvh]'
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => (!open ? closeDrawer() : undefined)}>
-      <SheetContent side={isDesktop ? 'right' : 'bottom'} showCloseButton={false} className={sharedSheetContentClassName}>
-        <SheetHeader className="border-b p-4 md:p-6">
+      <SheetContent side={isLargeScreen ? 'right' : 'bottom'} showCloseButton={false} className={sharedSheetContentClassName}>
+        <SheetHeader className="border-b p-4 sm:p-5 lg:p-6">
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <SheetTitle>{OPERATION_TITLES[type]}</SheetTitle>
               <SheetDescription>Заполните форму операции и подтвердите действие.</SheetDescription>
             </div>
@@ -427,7 +427,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
           </div>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
           {type === 'receipt' ? (
             <form onSubmit={submitReceipt} className="space-y-4">
               <div className="space-y-2">
@@ -457,7 +457,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
 
               <div className="space-y-3">
                 {receiptItemsArray.fields.map((field, index) => (
-                  <div key={field.id} className="space-y-2 rounded-md border p-3">
+                  <div key={field.id} className="space-y-3 rounded-md border p-3 sm:p-4">
                     {!hasFixedItem ? (
                       <>
                         <Controller
@@ -477,8 +477,9 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                         ) : null}
                       </>
                     ) : null}
-                    <div className="flex items-end gap-2">
-                      <div className="flex-1 space-y-2">
+
+                    <div className="grid gap-3 min-[480px]:grid-cols-[minmax(0,1fr)_auto] min-[480px]:items-end">
+                      <div className="space-y-2">
                         <Label>Количество</Label>
                         <Input
                           type="number"
@@ -490,10 +491,12 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                           <p className="text-xs text-destructive">{receiptForm.formState.errors.items[index]?.quantity?.message}</p>
                         ) : null}
                       </div>
+
                       {!hasFixedItem ? (
                         <Button
                           type="button"
                           variant="outline"
+                          className="w-full min-[480px]:w-auto"
                           onClick={() => receiptItemsArray.remove(index)}
                           disabled={receiptItemsArray.fields.length === 1}
                         >
@@ -503,11 +506,13 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                     </div>
                   </div>
                 ))}
+
                 {!hasFixedItem ? (
-                  <Button type="button" variant="outline" onClick={() => receiptItemsArray.append({ item_id: '', quantity: 1 })}>
+                  <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => receiptItemsArray.append({ item_id: '', quantity: 1 })}>
                     + Добавить товар
                   </Button>
                 ) : null}
+
                 {typeof receiptForm.formState.errors.items?.message === 'string' ? (
                   <p className="text-xs text-destructive">{receiptForm.formState.errors.items.message}</p>
                 ) : null}
@@ -521,74 +526,72 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
 
           {type === 'sale' ? (
             <form onSubmit={submitSale} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Склад</Label>
-                <Controller
-                  name="warehouse_id"
-                  control={saleForm.control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите склад" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeWarehouses.map((warehouse) => (
-                          <SelectItem key={warehouse.id} value={warehouse.id}>
-                            {warehouse.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {saleForm.formState.errors.warehouse_id ? (
-                  <p className="text-xs text-destructive">{saleForm.formState.errors.warehouse_id.message}</p>
-                ) : null}
-              </div>
-
-              {!hasFixedItem ? (
-                <div className="space-y-2">
-                  <Label>Товар</Label>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className={cn('space-y-2', hasFixedItem ? 'sm:col-span-2' : '')}>
+                  <Label>Склад</Label>
                   <Controller
-                    name="item_id"
+                    name="warehouse_id"
                     control={saleForm.control}
                     render={({ field }) => (
-                      <ItemCombobox
-                        items={saleItemOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder={saleWarehouseId ? 'Поиск товара (name/model/sku)' : 'Сначала выберите склад'}
-                        disabled={!saleWarehouseId}
-                      />
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Выберите склад" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activeWarehouses.map((warehouse) => (
+                            <SelectItem key={warehouse.id} value={warehouse.id}>
+                              {warehouse.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     )}
                   />
-                  {saleForm.formState.errors.item_id ? (
-                    <p className="text-xs text-destructive">{saleForm.formState.errors.item_id.message}</p>
-                  ) : null}
-                  {saleWarehouseId && saleItemId ? (
-                    <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p>
+                  {saleForm.formState.errors.warehouse_id ? (
+                    <p className="text-xs text-destructive">{saleForm.formState.errors.warehouse_id.message}</p>
                   ) : null}
                 </div>
-              ) : null}
 
-              <div className="space-y-2">
-                <Label>Количество</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={Math.max(1, availableSaleBalance)}
-                  step={1}
-                  {...saleForm.register('quantity', {
-                    valueAsNumber: true,
-                    validate: (value) => value <= availableSaleBalance || 'Нельзя списать больше остатка',
-                  })}
-                />
-                {saleForm.formState.errors.quantity ? (
-                  <p className="text-xs text-destructive">{saleForm.formState.errors.quantity.message}</p>
+                {!hasFixedItem ? (
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>Товар</Label>
+                    <Controller
+                      name="item_id"
+                      control={saleForm.control}
+                      render={({ field }) => (
+                        <ItemCombobox
+                          items={saleItemOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={saleWarehouseId ? 'Поиск товара (name/model/sku)' : 'Сначала выберите склад'}
+                          disabled={!saleWarehouseId}
+                        />
+                      )}
+                    />
+                    {saleForm.formState.errors.item_id ? (
+                      <p className="text-xs text-destructive">{saleForm.formState.errors.item_id.message}</p>
+                    ) : null}
+                    {saleWarehouseId && saleItemId ? <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p> : null}
+                  </div>
                 ) : null}
-                {hasFixedItem && saleWarehouseId && saleItemId ? (
-                  <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p>
-                ) : null}
+
+                <div className="space-y-2">
+                  <Label>Количество</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={Math.max(1, availableSaleBalance)}
+                    step={1}
+                    {...saleForm.register('quantity', {
+                      valueAsNumber: true,
+                      validate: (value) => value <= availableSaleBalance || 'Нельзя списать больше остатка',
+                    })}
+                  />
+                  {saleForm.formState.errors.quantity ? (
+                    <p className="text-xs text-destructive">{saleForm.formState.errors.quantity.message}</p>
+                  ) : null}
+                  {hasFixedItem && saleWarehouseId && saleItemId ? <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p> : null}
+                </div>
               </div>
 
               <Button type="submit" className={operationSubmitClassName('sale')} disabled={saleForm.formState.isSubmitting}>
@@ -599,101 +602,103 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
 
           {type === 'transfer' ? (
             <form onSubmit={submitTransfer} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Склад-источник</Label>
-                <Controller
-                  name="source_warehouse_id"
-                  control={transferForm.control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите склад" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeWarehouses.map((warehouse) => (
-                          <SelectItem key={warehouse.id} value={warehouse.id}>
-                            {warehouse.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {transferForm.formState.errors.source_warehouse_id ? (
-                  <p className="text-xs text-destructive">{transferForm.formState.errors.source_warehouse_id.message}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Склад-получатель</Label>
-                <Controller
-                  name="destination_warehouse_id"
-                  control={transferForm.control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите склад" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activeWarehouses
-                          .filter((warehouse) => warehouse.id !== transferSourceWarehouseId)
-                          .map((warehouse) => (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Склад-источник</Label>
+                  <Controller
+                    name="source_warehouse_id"
+                    control={transferForm.control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Выберите склад" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activeWarehouses.map((warehouse) => (
                             <SelectItem key={warehouse.id} value={warehouse.id}>
                               {warehouse.name}
                             </SelectItem>
                           ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {transferForm.formState.errors.destination_warehouse_id ? (
-                  <p className="text-xs text-destructive">{transferForm.formState.errors.destination_warehouse_id.message}</p>
-                ) : null}
-              </div>
-
-              {!hasFixedItem ? (
-                <div className="space-y-2">
-                  <Label>Товар</Label>
-                  <Controller
-                    name="item_id"
-                    control={transferForm.control}
-                    render={({ field }) => (
-                      <ItemCombobox
-                        items={transferItemOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder={transferSourceWarehouseId ? 'Поиск товара (name/model/sku)' : 'Сначала выберите склад-источник'}
-                        disabled={!transferSourceWarehouseId}
-                      />
+                        </SelectContent>
+                      </Select>
                     )}
                   />
-                  {transferForm.formState.errors.item_id ? (
-                    <p className="text-xs text-destructive">{transferForm.formState.errors.item_id.message}</p>
+                  {transferForm.formState.errors.source_warehouse_id ? (
+                    <p className="text-xs text-destructive">{transferForm.formState.errors.source_warehouse_id.message}</p>
                   ) : null}
-                  {transferSourceWarehouseId && transferItemId ? (
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Склад-получатель</Label>
+                  <Controller
+                    name="destination_warehouse_id"
+                    control={transferForm.control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Выберите склад" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {activeWarehouses
+                            .filter((warehouse) => warehouse.id !== transferSourceWarehouseId)
+                            .map((warehouse) => (
+                              <SelectItem key={warehouse.id} value={warehouse.id}>
+                                {warehouse.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {transferForm.formState.errors.destination_warehouse_id ? (
+                    <p className="text-xs text-destructive">{transferForm.formState.errors.destination_warehouse_id.message}</p>
+                  ) : null}
+                </div>
+
+                {!hasFixedItem ? (
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>Товар</Label>
+                    <Controller
+                      name="item_id"
+                      control={transferForm.control}
+                      render={({ field }) => (
+                        <ItemCombobox
+                          items={transferItemOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={transferSourceWarehouseId ? 'Поиск товара (name/model/sku)' : 'Сначала выберите склад-источник'}
+                          disabled={!transferSourceWarehouseId}
+                        />
+                      )}
+                    />
+                    {transferForm.formState.errors.item_id ? (
+                      <p className="text-xs text-destructive">{transferForm.formState.errors.item_id.message}</p>
+                    ) : null}
+                    {transferSourceWarehouseId && transferItemId ? (
+                      <p className="text-xs text-muted-foreground">В наличии: {availableTransferBalance} шт</p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className={cn('space-y-2', hasFixedItem ? 'sm:col-span-2' : '')}>
+                  <Label>Количество</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={Math.max(1, availableTransferBalance)}
+                    step={1}
+                    {...transferForm.register('quantity', {
+                      valueAsNumber: true,
+                      validate: (value) => value <= availableTransferBalance || 'Нельзя списать больше остатка',
+                    })}
+                  />
+                  {transferForm.formState.errors.quantity ? (
+                    <p className="text-xs text-destructive">{transferForm.formState.errors.quantity.message}</p>
+                  ) : null}
+                  {hasFixedItem && transferSourceWarehouseId && transferItemId ? (
                     <p className="text-xs text-muted-foreground">В наличии: {availableTransferBalance} шт</p>
                   ) : null}
                 </div>
-              ) : null}
-
-              <div className="space-y-2">
-                <Label>Количество</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={Math.max(1, availableTransferBalance)}
-                  step={1}
-                  {...transferForm.register('quantity', {
-                    valueAsNumber: true,
-                    validate: (value) => value <= availableTransferBalance || 'Нельзя списать больше остатка',
-                  })}
-                />
-                {transferForm.formState.errors.quantity ? (
-                  <p className="text-xs text-destructive">{transferForm.formState.errors.quantity.message}</p>
-                ) : null}
-                {hasFixedItem && transferSourceWarehouseId && transferItemId ? (
-                  <p className="text-xs text-muted-foreground">В наличии: {availableTransferBalance} шт</p>
-                ) : null}
               </div>
 
               <Button type="submit" className={operationSubmitClassName('transfer')} disabled={transferForm.formState.isSubmitting}>

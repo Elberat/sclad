@@ -34,6 +34,7 @@ import {
   type CreateUserPayload,
 } from '@/hooks/useUsers'
 import type { Profile, Role } from '@/lib/supabase'
+import { createActionClassName } from '@/lib/utils'
 
 const ROLE_LABELS: Record<Role, string> = {
   viewer: 'Наблюдатель',
@@ -143,7 +144,7 @@ export function UsersPage() {
         title="Пользователи"
         description="Управление аккаунтами, ролями и доступом."
         action={
-          <Button onClick={() => setIsCreateOpen(true)}>
+          <Button variant="outline" className={createActionClassName()} onClick={() => setIsCreateOpen(true)}>
             <Plus className="size-4" />
             Создать пользователя
           </Button>
@@ -330,7 +331,7 @@ function CreateUserSheet({
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="mt-auto w-full" disabled={createUserMutation.isPending}>
+          <Button type="submit" variant="outline" className={createActionClassName('mt-auto w-full')} disabled={createUserMutation.isPending}>
             {createUserMutation.isPending ? 'Создаем...' : 'Создать пользователя'}
           </Button>
         </form>

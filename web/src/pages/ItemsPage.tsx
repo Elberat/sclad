@@ -18,6 +18,7 @@ import { useActiveCategoriesQuery } from '@/hooks/useCategories'
 import { useItemsQuery } from '@/hooks/useItems'
 import { useWarehousesQuery } from '@/hooks/useWarehouses'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { createActionClassName } from '@/lib/utils'
 
 type StockFilter = 'all' | 'in-stock' | 'out-of-stock'
 type StatusFilter = 'active' | 'archived'
@@ -70,7 +71,7 @@ export function ItemsPage() {
         description="Номенклатура и остатки."
         action={
           <RoleGate permission="canCreateItem">
-            <Button onClick={() => setIsModalOpen(true)}>
+            <Button variant="outline" className={createActionClassName()} onClick={() => setIsModalOpen(true)}>
               <Plus />
               Создать товар
             </Button>
@@ -174,7 +175,7 @@ export function ItemsPage() {
               </Button>
             ) : (
               <RoleGate permission="canCreateItem">
-                <Button type="button" onClick={() => setIsModalOpen(true)}>
+                <Button type="button" variant="outline" className={createActionClassName()} onClick={() => setIsModalOpen(true)}>
                   <Plus />
                   Создать товар
                 </Button>

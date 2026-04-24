@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useWarehousesQuery, type WarehouseWithCount } from '@/hooks/useWarehouses'
+import { createActionClassName } from '@/lib/utils'
 
 type FilterMode = 'active' | 'archived' | 'all'
 
@@ -36,7 +37,7 @@ export function WarehousesPage() {
         description="Список складов и остатки по позициям."
         action={
           <RoleGate permission="canCreateWarehouse">
-            <Button onClick={() => setIsCreateOpen(true)}>
+            <Button variant="outline" className={createActionClassName()} onClick={() => setIsCreateOpen(true)}>
               <Plus />
               Создать склад
             </Button>
@@ -69,6 +70,14 @@ export function WarehousesPage() {
           icon={Building2}
           title="Склады не найдены"
           description="Измените фильтр или создайте новый склад."
+          cta={
+            <RoleGate permission="canCreateWarehouse">
+              <Button type="button" variant="outline" className={createActionClassName()} onClick={() => setIsCreateOpen(true)}>
+                <Plus />
+                Создать склад
+              </Button>
+            </RoleGate>
+          }
         />
       ) : (
         <WarehousesTable warehouses={filteredWarehouses} />
@@ -86,8 +95,8 @@ function SegmentButton({ active, onClick, children }: { active: boolean; onClick
       size="sm"
       className={
         active
-          ? 'border-foreground bg-transparent text-foreground hover:bg-muted'
-          : 'border-transparent bg-transparent text-foreground shadow-none hover:border-transparent hover:bg-muted'
+          ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
+          : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
       }
       aria-pressed={active}
       onClick={onClick}

@@ -1,17 +1,39 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRightLeft, Boxes, Building2, Package, ReceiptText, Scale, TrendingDown, TrendingUp } from 'lucide-react'
+import {
+  ArrowRightLeft,
+  Boxes,
+  Building2,
+  EllipsisVertical,
+  LogOut,
+  Package,
+  ReceiptText,
+  Scale,
+  TrendingDown,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { EmptyState } from '@/components/shared/EmptyState'
+import { RoleGate } from '@/components/shared/RoleGate'
 import { TableSkeleton } from '@/components/shared/TableSkeleton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RoleGate } from '@/components/shared/RoleGate'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAuth } from '@/contexts/AuthContext'
+import { PERMISSIONS } from '@/lib/permissions'
 import { supabase } from '@/lib/supabase'
 
 type OperationType = 'receipt' | 'sale' | 'transfer'
+
 type DashboardOperation = {
   id: string
   type: OperationType
@@ -47,6 +69,7 @@ function formatDateTime(value: string) {
 export function DashboardPage() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const canManageUsers = profile ? Boolean(PERMISSIONS[profile.role]?.canManageUsers) : false
 
   const dashboardQuery = useQuery({
     queryKey: ['dashboard'],
@@ -92,20 +115,38 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 xl:gap-6">
       <div className="flex items-start justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Дашборд</h1>
-        <Button variant="outline" size="sm" className="md:hidden" onClick={handleSignOut}>
-          Выйти
-        </Button>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Дашборд</h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-input bg-background text-foreground shadow-sm transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20">
+            <EllipsisVertical className="h-4 w-4" />
+            <span className="sr-only">Открыть меню пользователя</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel className="normal-case tracking-normal text-foreground">
+              <div className="space-y-0.5">
+                <p className="truncate text-sm font-semibold">{profile?.full_name || profile?.email || 'Пользователь'}</p>
+                <p className="truncate text-xs text-muted-foreground">{profile?.role}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {canManageUsers ? (
+              <DropdownMenuItem onClick={() => navigate('/users')} className="normal-case text-sm tracking-normal">
+                <Users className="h-4 w-4" />
+                Пользователи
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem onClick={() => void handleSignOut()} className="normal-case text-sm tracking-normal text-rose-600 focus:text-rose-700">
+              <LogOut className="h-4 w-4" />
+              Выйти
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="rounded-md border p-3 md:hidden">
-        <p className="truncate text-sm font-medium">{profile?.full_name || profile?.email || 'Пользователь'}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{profile?.role}</p>
-      </div>
-
-      <section className="grid grid-cols-2 overflow-hidden rounded-md border md:grid-cols-4">
+      <section className="grid overflow-hidden rounded-md border min-[360px]:grid-cols-2 xl:grid-cols-4">
         <MetricStat title="Склады" value={dashboardQuery.data?.activeWarehouses ?? 0} icon={Building2} />
         <MetricStat title="Товары" value={dashboardQuery.data?.activeItems ?? 0} icon={Package} />
         <MetricStat title="Категории" value={dashboardQuery.data?.activeCategories ?? 0} icon={Boxes} />
@@ -114,7 +155,7 @@ export function DashboardPage() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Быстрые операции</h2>
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 min-[520px]:grid-cols-2 xl:grid-cols-3">
           <RoleGate permission="canDoReceipt">
             <OperationLink to="/operations/receipt" type="receipt" icon={TrendingUp} label="Приход" />
           </RoleGate>
@@ -128,9 +169,9 @@ export function DashboardPage() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-center min-[560px]:justify-between">
           <h2 className="text-lg font-semibold">Последние 10 операций</h2>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="w-full min-[560px]:w-auto">
             <Link to="/history">Вся история</Link>
           </Button>
         </div>
@@ -138,57 +179,54 @@ export function DashboardPage() {
         {dashboardQuery.isLoading ? (
           <TableSkeleton columns={6} rows={5} />
         ) : (dashboardQuery.data?.latestOperations.length ?? 0) === 0 ? (
-          <EmptyState icon={ReceiptText} title="Операций пока нет" description="Проведите приход, расход или перемещение, и здесь появится последняя активность." />
+          <EmptyState
+            icon={ReceiptText}
+            title="Операций пока нет"
+            description="Проведите приход, расход или перемещение, и здесь появится последняя активность."
+          />
         ) : (
           <div data-no-pull-refresh="true">
-            <div className="grid gap-3 md:hidden">
+            <div className="grid gap-3 sm:grid-cols-2 2xl:hidden">
               {(dashboardQuery.data?.latestOperations ?? []).map((operation) => (
                 <OperationCard key={operation.id} operation={operation} />
               ))}
             </div>
 
-            <div className="hidden overflow-hidden rounded-md border md:block">
-              <Table className="w-full table-fixed md:table-auto">
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="hidden md:table-cell">Тип</TableHead>
-                  <TableHead className="w-[44%] md:w-auto">Операция</TableHead>
-                  <TableHead className="w-[24%] text-right md:w-auto">Кол-во</TableHead>
-                  <TableHead className="hidden md:table-cell">Откуда</TableHead>
-                  <TableHead className="hidden md:table-cell">Куда</TableHead>
-                  <TableHead className="hidden md:table-cell">Сотрудник</TableHead>
-                  <TableHead className="w-[32%] md:w-auto">Время</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(dashboardQuery.data?.latestOperations ?? []).map((operation) => (
-                  <TableRow key={operation.id}>
-                    <TableCell className="hidden md:table-cell">
-                      <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-                    </TableCell>
-                    <TableCell className="whitespace-normal break-words">
-                      <div className="mb-1 md:hidden">
-                        <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-                      </div>
-                      <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="block font-medium underline">
-                        {operation.items?.name ?? '-'}
-                      </Link>
-                      <p className="text-xs text-muted-foreground">
-                        {operation.items?.model || '-'} / {operation.items?.sku || '-'}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground md:hidden">
-                        {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
-                      </p>
-                      <p className="text-xs text-muted-foreground md:hidden">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
-                    <TableCell className="hidden md:table-cell">{operation.source_warehouse?.name ?? '-'}</TableCell>
-                    <TableCell className="hidden md:table-cell">{operation.destination_warehouse?.name ?? '-'}</TableCell>
-                    <TableCell className="hidden md:table-cell">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
-                    <TableCell className="whitespace-normal text-xs md:text-sm">{formatDateTime(operation.created_at)}</TableCell>
+            <div className="hidden overflow-hidden rounded-md border 2xl:block">
+              <Table className="w-full table-auto">
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Тип</TableHead>
+                    <TableHead>Операция</TableHead>
+                    <TableHead className="text-right">Кол-во</TableHead>
+                    <TableHead>Откуда</TableHead>
+                    <TableHead>Куда</TableHead>
+                    <TableHead>Сотрудник</TableHead>
+                    <TableHead>Время</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
+                </TableHeader>
+                <TableBody>
+                  {(dashboardQuery.data?.latestOperations ?? []).map((operation) => (
+                    <TableRow key={operation.id}>
+                      <TableCell>
+                        <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                      </TableCell>
+                      <TableCell className="whitespace-normal break-words">
+                        <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="block font-medium underline">
+                          {operation.items?.name ?? '-'}
+                        </Link>
+                        <p className="text-xs text-muted-foreground">
+                          {operation.items?.model || '-'} / {operation.items?.sku || '-'}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
+                      <TableCell>{operation.source_warehouse?.name ?? '-'}</TableCell>
+                      <TableCell>{operation.destination_warehouse?.name ?? '-'}</TableCell>
+                      <TableCell>{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
+                      <TableCell className="whitespace-normal text-sm">{formatDateTime(operation.created_at)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             </div>
           </div>
@@ -200,8 +238,8 @@ export function DashboardPage() {
 
 function OperationCard({ operation }: { operation: DashboardOperation }) {
   return (
-    <div className="rounded-md border bg-card p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
+    <div className="rounded-md border bg-card p-4 shadow-sm sm:p-5">
+      <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
         <div className="min-w-0">
           <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
           <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="mt-2 block break-words font-medium underline">
@@ -211,12 +249,12 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
             {operation.items?.model || '-'} / {operation.items?.sku || '-'}
           </p>
         </div>
-        <div className="text-right">
+        <div className="min-[420px]:text-right">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Кол-во</p>
           <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
         </div>
       </div>
-      <div className="mt-3 grid gap-2 border-t pt-3 text-xs text-muted-foreground">
+      <div className="mt-3 grid gap-2 border-t pt-3 text-xs text-muted-foreground min-[720px]:grid-cols-2">
         <p>
           <span className="font-medium text-foreground">Маршрут: </span>
           {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
@@ -225,7 +263,7 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
           <span className="font-medium text-foreground">Сотрудник: </span>
           {operation.profiles?.full_name || operation.profiles?.email || 'Система'}
         </p>
-        <p>
+        <p className="min-[720px]:col-span-2">
           <span className="font-medium text-foreground">Время: </span>
           {formatDateTime(operation.created_at)}
         </p>
@@ -252,10 +290,14 @@ function OperationLink({
   label: string
 }) {
   return (
-    <Button asChild variant="outline" className={`justify-start gap-2 ${quickOperationClassName(type)}`}>
+    <Button
+      asChild
+      variant="outline"
+      className={`h-auto min-h-11 w-full justify-start gap-2 px-4 py-3 text-left whitespace-normal ${quickOperationClassName(type)}`}
+    >
       <Link to={to}>
-        <Icon className="h-4 w-4" />
-        {label}
+        <Icon className="h-4 w-4 shrink-0" />
+        <span className="truncate">{label}</span>
       </Link>
     </Button>
   )
@@ -273,13 +315,13 @@ function MetricStat({
   icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-r px-3 py-3 last:border-r-0 even:border-r-0 md:border-b-0 md:even:border-r md:last:border-r-0">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground">
+    <div className="flex min-w-0 items-center gap-3 border-b px-3 py-3 last:border-b-0 min-[360px]:border-r min-[360px]:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(4)]:border-r-0">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground sm:h-10 sm:w-10">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">
         <p className="truncate text-xs text-muted-foreground">{title}</p>
-        <p className="text-lg font-semibold leading-6 tabular-nums">
+        <p className="text-lg font-semibold leading-6 tabular-nums sm:text-xl">
           {value}
           {suffix ? ` ${suffix}` : ''}
         </p>

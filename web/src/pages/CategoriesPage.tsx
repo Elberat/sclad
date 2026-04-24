@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useArchiveCategoryMutation, useCategoriesQuery, type CategoryRow } from '@/hooks/useCategories'
+import { createActionClassName } from '@/lib/utils'
 
 type StatusFilter = 'active' | 'archived'
 
@@ -45,7 +46,7 @@ export function CategoriesPage() {
         description="Управление категориями товаров."
         action={
           <RoleGate permission="canCreateCategory">
-            <Button onClick={openCreateModal}>
+            <Button variant="outline" className={createActionClassName()} onClick={openCreateModal}>
               <Plus />
               Создать категорию
             </Button>
@@ -53,33 +54,13 @@ export function CategoriesPage() {
         }
       />
 
-      <div className="grid grid-cols-2 rounded-md border p-1 sm:inline-grid sm:w-auto">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={
-            statusFilter === 'active'
-              ? 'bg-muted text-foreground shadow-sm'
-              : 'border-transparent bg-transparent text-muted-foreground shadow-none hover:bg-muted/60 hover:text-foreground'
-          }
-          aria-pressed={statusFilter === 'active'}
-          onClick={() => setStatusFilter('active')}
-        >
+      <div className="flex gap-2">
+        <StatusFilterButton active={statusFilter === 'active'} onClick={() => setStatusFilter('active')}>
           Активные
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={
-            statusFilter === 'archived'
-              ? 'bg-muted text-foreground shadow-sm'
-              : 'border-transparent bg-transparent text-muted-foreground shadow-none hover:bg-muted/60 hover:text-foreground'
-          }
-          aria-pressed={statusFilter === 'archived'}
-          onClick={() => setStatusFilter('archived')}
-        >
+        </StatusFilterButton>
+        <StatusFilterButton active={statusFilter === 'archived'} onClick={() => setStatusFilter('archived')}>
           Архивные
-        </Button>
+        </StatusFilterButton>
       </div>
 
       {categoriesQuery.isLoading ? (
@@ -92,7 +73,7 @@ export function CategoriesPage() {
           cta={
             statusFilter === 'active' ? (
               <RoleGate permission="canCreateCategory">
-                <Button type="button" onClick={openCreateModal}>
+                <Button type="button" variant="outline" className={createActionClassName()} onClick={openCreateModal}>
                   <Plus />
                   Создать категорию
                 </Button>
@@ -206,5 +187,23 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
     <Badge variant={isActive ? 'default' : 'secondary'} className={isActive ? 'text-emerald-700' : undefined}>
       {isActive ? 'Активная' : 'Архивная'}
     </Badge>
+  )
+}
+
+function StatusFilterButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className={
+        active
+          ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
+          : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
+      }
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {children}
+    </Button>
   )
 }
