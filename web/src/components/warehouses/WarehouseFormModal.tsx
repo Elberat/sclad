@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { useUpsertWarehouseMutation } from '@/hooks/useWarehouses'
 
 const warehouseSchema = z.object({
@@ -44,6 +45,7 @@ function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
 
 export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
+  const viewportHeight = useViewportHeight(open && !isDesktop)
   const upsertWarehouse = useUpsertWarehouseMutation()
 
   const form = useForm<WarehouseFormValues>({
@@ -138,7 +140,11 @@ export function WarehouseFormModal({ open, onOpenChange, warehouse }: WarehouseF
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[100dvh] rounded-t-2xl pb-0">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl pb-0"
+        style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+      >
         <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>

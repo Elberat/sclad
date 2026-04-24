@@ -16,8 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useActiveCategoriesQuery } from '@/hooks/useCategories'
 import { useItemsQuery } from '@/hooks/useItems'
-import { useWarehousesQuery } from '@/hooks/useWarehouses'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { useWarehousesQuery } from '@/hooks/useWarehouses'
 import { createActionClassName } from '@/lib/utils'
 
 type StockFilter = 'all' | 'in-stock' | 'out-of-stock'
@@ -34,6 +34,7 @@ export function ItemsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [warehouseFilter, setWarehouseFilter] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
+
   const hasActiveFilters =
     search.trim() !== '' || categoryFilter !== 'all' || stockFilter !== 'all' || statusFilter !== 'active' || warehouseFilter !== 'all'
 
@@ -80,9 +81,17 @@ export function ItemsPage() {
       />
 
       <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-base">Фильтры</CardTitle>
+        <CardHeader className="gap-3">
+          <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between">
+            <CardTitle className="text-base">Фильтры</CardTitle>
+            {hasActiveFilters ? (
+              <Button type="button" variant="outline" size="sm" className="w-full min-[520px]:w-auto" onClick={resetFilters}>
+                Сбросить фильтры
+              </Button>
+            ) : null}
+          </div>
         </CardHeader>
+
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <div className="space-y-2 sm:col-span-2 lg:col-span-2">
             <Label htmlFor="items-search">Поиск</Label>
@@ -123,11 +132,13 @@ export function ItemsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все склады</SelectItem>
-                {(warehousesQuery.data ?? []).filter((warehouse) => warehouse.is_active).map((warehouse) => (
-                  <SelectItem key={warehouse.id} value={warehouse.id}>
-                    {warehouse.name}
-                  </SelectItem>
-                ))}
+                {(warehousesQuery.data ?? [])
+                  .filter((warehouse) => warehouse.is_active)
+                  .map((warehouse) => (
+                    <SelectItem key={warehouse.id} value={warehouse.id}>
+                      {warehouse.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -197,12 +208,7 @@ export function ItemsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <p className="min-w-0 break-words font-medium leading-5">{item.name}</p>
-                      <Badge
-                        variant={item.is_active ? 'default' : 'secondary'}
-                        className={item.is_active ? 'text-emerald-700' : 'text-muted-foreground'}
-                      >
-                        {item.is_active ? 'Активный' : 'Архивный'}
-                      </Badge>
+                      <Badge variant={item.is_active ? 'default' : 'secondary'}>{item.is_active ? 'Активный' : 'Архивный'}</Badge>
                     </div>
                     <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
                       <p>{item.model || 'Без модели'}</p>
@@ -221,47 +227,47 @@ export function ItemsPage() {
 
           <div className="hidden overflow-hidden rounded-md border md:block">
             <Table className="w-full table-fixed md:table-auto">
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="hidden w-[72px] md:table-cell">Фото</TableHead>
-                <TableHead className="w-[48%] md:w-auto">Товар</TableHead>
-                <TableHead className="hidden md:table-cell">Модель</TableHead>
-                <TableHead className="hidden md:table-cell">SKU</TableHead>
-                <TableHead className="hidden md:table-cell">Категория</TableHead>
-                <TableHead className="w-[24%] text-right md:w-auto">Остаток</TableHead>
-                <TableHead className="w-[28%] md:w-auto">Статус</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="hidden md:table-cell">
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="h-10 w-10 rounded object-cover" />
-                    ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded bg-muted text-[10px] text-muted-foreground">N/A</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="whitespace-normal break-words">
-                    <Link className="font-medium hover:underline" to={`/items/${item.id}`}>
-                      {item.name}
-                    </Link>
-                    <div className="mt-1 space-y-0.5 text-xs text-muted-foreground md:hidden">
-                      <p>{item.model || 'Без модели'}</p>
-                      <p>SKU: {item.sku || '-'}</p>
-                      <p>{item.item_categories?.name || 'Без категории'}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{item.model || '-'}</TableCell>
-                  <TableCell className="hidden md:table-cell">{item.sku || '-'}</TableCell>
-                  <TableCell className="hidden md:table-cell">{item.item_categories?.name || '-'}</TableCell>
-                  <TableCell className="text-right font-medium">{item.total_quantity}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.is_active ? 'default' : 'secondary'}>{item.is_active ? 'Активный' : 'Архивный'}</Badge>
-                  </TableCell>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="hidden w-[72px] md:table-cell">Фото</TableHead>
+                  <TableHead className="w-[48%] md:w-auto">Товар</TableHead>
+                  <TableHead className="hidden md:table-cell">Модель</TableHead>
+                  <TableHead className="hidden md:table-cell">SKU</TableHead>
+                  <TableHead className="hidden md:table-cell">Категория</TableHead>
+                  <TableHead className="w-[24%] text-right md:w-auto">Остаток</TableHead>
+                  <TableHead className="w-[28%] md:w-auto">Статус</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="hidden md:table-cell">
+                      {item.image_url ? (
+                        <img src={item.image_url} alt={item.name} className="h-10 w-10 rounded object-cover" />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded bg-muted text-[10px] text-muted-foreground">N/A</div>
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      <Link className="font-medium hover:underline" to={`/items/${item.id}`}>
+                        {item.name}
+                      </Link>
+                      <div className="mt-1 space-y-0.5 text-xs text-muted-foreground md:hidden">
+                        <p>{item.model || 'Без модели'}</p>
+                        <p>SKU: {item.sku || '-'}</p>
+                        <p>{item.item_categories?.name || 'Без категории'}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">{item.model || '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell">{item.sku || '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell">{item.item_categories?.name || '-'}</TableCell>
+                    <TableCell className="text-right font-medium">{item.total_quantity}</TableCell>
+                    <TableCell>
+                      <Badge variant={item.is_active ? 'default' : 'secondary'}>{item.is_active ? 'Активный' : 'Архивный'}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
             </Table>
           </div>
         </div>

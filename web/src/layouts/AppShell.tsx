@@ -73,7 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
+      <main className="pb-[calc(84px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden">
         <div

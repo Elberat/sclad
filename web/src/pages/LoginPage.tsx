@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/AuthContext'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { isSupabaseConfigured } from '@/lib/supabase'
 
 const loginSchema = z.object({
@@ -23,6 +25,8 @@ export function LoginPage() {
   const { user, signIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const viewportHeight = useViewportHeight(!isDesktop)
   const [showPassword, setShowPassword] = useState(false)
   const [formError, setFormError] = useState('')
 
@@ -50,8 +54,11 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4 pb-[env(safe-area-inset-bottom)]">
-      <Card className="w-full max-w-md">
+    <div
+      className="flex items-start justify-center p-4 pt-24 pb-[max(1rem,env(safe-area-inset-bottom))] md:min-h-dvh md:items-center md:pt-4"
+      style={{ minHeight: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+    >
+      <Card className="w-full max-w-md shadow-sm">
         <CardHeader>
           <CardTitle>Вход</CardTitle>
           <CardDescription>Войдите в систему управления складом.</CardDescription>
@@ -62,10 +69,11 @@ export function LoginPage() {
               Добавьте `.env` в папку `web` с `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY`, затем перезапустите dev server.
             </div>
           ) : null}
+
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" autoComplete="email" {...form.register('email')} />
+              <Input id="email" type="email" autoComplete="email" inputMode="email" {...form.register('email')} />
               {form.formState.errors.email ? <p className="text-xs text-destructive">{form.formState.errors.email.message}</p> : null}
             </div>
 

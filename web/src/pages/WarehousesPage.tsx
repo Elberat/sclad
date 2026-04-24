@@ -45,7 +45,7 @@ export function WarehousesPage() {
         }
       />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <SegmentButton active={filterMode === 'active'} onClick={() => setFilterMode('active')}>
           Активные
         </SegmentButton>
@@ -94,9 +94,11 @@ function SegmentButton({ active, onClick, children }: { active: boolean; onClick
       variant="outline"
       size="sm"
       className={
-        active
-          ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
-          : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
+        (
+          active
+            ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
+            : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
+        ) + ' min-w-[128px] flex-1 sm:flex-none'
       }
       aria-pressed={active}
       onClick={onClick}
@@ -112,8 +114,27 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
 
 function WarehousesTable({ warehouses }: { warehouses: WarehouseWithCount[] }) {
   return (
-    <div data-no-pull-refresh="true" className="overflow-hidden rounded-md border">
-      <Table className="w-full table-fixed md:table-auto">
+    <div data-no-pull-refresh="true">
+      <div className="grid gap-3 md:hidden">
+        {warehouses.map((warehouse) => (
+          <Link key={warehouse.id} to={`/warehouses/${warehouse.id}`} className="block rounded-md border bg-card p-4 shadow-sm active:bg-muted/60">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words font-medium leading-5">{warehouse.name}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{warehouse.description || 'Без описания'}</p>
+              </div>
+              <StatusBadge isActive={warehouse.is_active} />
+            </div>
+            <div className="mt-4 flex items-center justify-between border-t pt-3">
+              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Позиций</span>
+              <span className="text-lg font-semibold tabular-nums">{warehouse.itemsCount}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-md border md:block">
+        <Table className="w-full table-fixed md:table-auto">
         <TableHeader>
           <TableRow className="bg-muted/50">
             <TableHead className="w-[46%] md:w-auto">Склад</TableHead>
@@ -139,7 +160,8 @@ function WarehousesTable({ warehouses }: { warehouses: WarehouseWithCount[] }) {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   )
 }

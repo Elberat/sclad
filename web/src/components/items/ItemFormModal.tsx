@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useActiveCategoriesQuery } from '@/hooks/useCategories'
 import { useUpsertItemMutation, type ItemRow } from '@/hooks/useItems'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { supabase } from '@/lib/supabase'
 
 const itemSchema = z.object({
@@ -53,6 +54,7 @@ function actionButtonClassName(kind: 'cancel' | 'submit', isCreate: boolean) {
 
 export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
+  const viewportHeight = useViewportHeight(open && !isDesktop)
   const categoriesQuery = useActiveCategoriesQuery()
   const upsertItem = useUpsertItemMutation()
   const itemImageKey = item?.id ?? 'new'
@@ -289,7 +291,11 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[100dvh] rounded-t-2xl pb-0">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl pb-0"
+        style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+      >
         <SheetHeader className="shrink-0 border-b px-4 pb-4 pt-5 text-left">
           <SheetTitle>{item ? 'Редактировать товар' : 'Создать товар'}</SheetTitle>
           <SheetDescription>Заполните карточку товара.</SheetDescription>

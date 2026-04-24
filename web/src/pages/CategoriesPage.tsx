@@ -54,7 +54,7 @@ export function CategoriesPage() {
         }
       />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <StatusFilterButton active={statusFilter === 'active'} onClick={() => setStatusFilter('active')}>
           Активные
         </StatusFilterButton>
@@ -195,11 +195,11 @@ function StatusFilterButton({ active, onClick, children }: { active: boolean; on
     <Button
       variant="outline"
       size="sm"
-      className={
+      className={`min-w-[140px] flex-1 sm:flex-none ${
         active
           ? 'border-amber-300 bg-amber-50 text-amber-900 shadow-sm hover:border-amber-400 hover:bg-amber-100'
           : 'border-border bg-background text-foreground shadow-none hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900'
-      }
+      }`}
       aria-pressed={active}
       onClick={onClick}
     >

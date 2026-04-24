@@ -132,15 +132,25 @@ export function HistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">История</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Журнал операций по складу с фильтрацией и пагинацией.</p>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">История</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Журнал операций по складу с фильтрацией и пагинацией.</p>
       </div>
 
       <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-base">Фильтры</CardTitle>
-          <CardDescription>Параметры сохраняются в URL, ссылкой можно делиться.</CardDescription>
+        <CardHeader className="gap-3">
+          <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between">
+            <div>
+              <CardTitle className="text-base">Фильтры</CardTitle>
+              <CardDescription>Параметры сохраняются в URL, ссылкой можно делиться.</CardDescription>
+            </div>
+            {hasActiveFilters ? (
+              <Button type="button" variant="outline" size="sm" className="w-full min-[520px]:w-auto" onClick={resetFilters}>
+                Сбросить фильтры
+              </Button>
+            ) : null}
+          </div>
         </CardHeader>
+
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-2">
             <Label>Склад</Label>
@@ -150,11 +160,13 @@ export function HistoryPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все склады</SelectItem>
-                {(warehousesQuery.data ?? []).filter((warehouse) => warehouse.is_active).map((warehouse) => (
-                  <SelectItem key={warehouse.id} value={warehouse.id}>
-                    {warehouse.name}
-                  </SelectItem>
-                ))}
+                {(warehousesQuery.data ?? [])
+                  .filter((warehouse) => warehouse.is_active)
+                  .map((warehouse) => (
+                    <SelectItem key={warehouse.id} value={warehouse.id}>
+                      {warehouse.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -167,11 +179,13 @@ export function HistoryPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все товары</SelectItem>
-                {(itemsQuery.data ?? []).filter((item) => item.is_active).map((item) => (
-                  <SelectItem key={item.id} value={item.id}>
-                    {item.name}
-                  </SelectItem>
-                ))}
+                {(itemsQuery.data ?? [])
+                  .filter((item) => item.is_active)
+                  .map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -258,46 +272,46 @@ export function HistoryPage() {
 
           <div className="hidden overflow-hidden rounded-md border md:block">
             <Table className="w-full table-fixed md:table-auto">
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="hidden md:table-cell">Тип</TableHead>
-                <TableHead className="w-[44%] md:w-auto">Операция</TableHead>
-                <TableHead className="w-[24%] text-right md:w-auto">Кол-во</TableHead>
-                <TableHead className="hidden md:table-cell">Откуда</TableHead>
-                <TableHead className="hidden md:table-cell">Куда</TableHead>
-                <TableHead className="hidden md:table-cell">Сотрудник</TableHead>
-                <TableHead className="w-[32%] md:w-auto">Время</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {(operationsQuery.data?.rows ?? []).map((operation) => (
-                <TableRow key={operation.id}>
-                  <TableCell className="hidden md:table-cell">
-                    <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-                  </TableCell>
-                  <TableCell className="whitespace-normal break-words">
-                    <div className="mb-1 md:hidden">
-                      <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-                    </div>
-                    <Link to={operation.item_id ? `/items/${operation.item_id}` : '/items'} className="block font-medium underline">
-                      {operation.items?.name ?? '-'}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">
-                      {operation.items?.model || '-'} / {operation.items?.sku || '-'}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground md:hidden">
-                      {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
-                    </p>
-                    <p className="text-xs text-muted-foreground md:hidden">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
-                  <TableCell className="hidden md:table-cell">{operation.source_warehouse?.name ?? '-'}</TableCell>
-                  <TableCell className="hidden md:table-cell">{operation.destination_warehouse?.name ?? '-'}</TableCell>
-                  <TableCell className="hidden md:table-cell">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
-                  <TableCell className="whitespace-normal text-xs md:text-sm">{formatDateTime(operation.created_at)}</TableCell>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="hidden md:table-cell">Тип</TableHead>
+                  <TableHead className="w-[44%] md:w-auto">Операция</TableHead>
+                  <TableHead className="w-[24%] text-right md:w-auto">Кол-во</TableHead>
+                  <TableHead className="hidden md:table-cell">Откуда</TableHead>
+                  <TableHead className="hidden md:table-cell">Куда</TableHead>
+                  <TableHead className="hidden md:table-cell">Сотрудник</TableHead>
+                  <TableHead className="w-[32%] md:w-auto">Время</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHeader>
+              <TableBody>
+                {(operationsQuery.data?.rows ?? []).map((operation) => (
+                  <TableRow key={operation.id}>
+                    <TableCell className="hidden md:table-cell">
+                      <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      <div className="mb-1 md:hidden">
+                        <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                      </div>
+                      <Link to={operation.item_id ? `/items/${operation.item_id}` : '/items'} className="block font-medium underline">
+                        {operation.items?.name ?? '-'}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">
+                        {operation.items?.model || '-'} / {operation.items?.sku || '-'}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground md:hidden">
+                        {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
+                      </p>
+                      <p className="text-xs text-muted-foreground md:hidden">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
+                    <TableCell className="hidden md:table-cell">{operation.source_warehouse?.name ?? '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell">{operation.destination_warehouse?.name ?? '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
+                    <TableCell className="whitespace-normal text-xs md:text-sm">{formatDateTime(operation.created_at)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
             </Table>
           </div>
         </div>
