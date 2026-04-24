@@ -173,17 +173,17 @@ export function HistoryPage() {
 
           <div className="space-y-2">
             <Label>Товар</Label>
-            <Select value={itemId || 'all'} onValueChange={(value) => updateFilter('itemId', value === 'all' ? '' : value)}>
+            <Select value={itemId || 'all'} onValueChange={(value) => updateFilter('itemId', value === 'all' ? '' : value)} >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Все товары" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent >
                 <SelectItem value="all">Все товары</SelectItem>
                 {(itemsQuery.data ?? [])
                   .filter((item) => item.is_active)
                   .map((item) => (
                     <SelectItem key={item.id} value={item.id}>
-                      {item.name}
+                      {item.name} - {item.model}
                     </SelectItem>
                   ))}
               </SelectContent>

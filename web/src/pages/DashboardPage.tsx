@@ -266,6 +266,7 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
         <p className="min-[720px]:col-span-2">
           <span className="font-medium text-foreground">Время: </span>
           {formatDateTime(operation.created_at)}
+          
         </p>
       </div>
     </div>
