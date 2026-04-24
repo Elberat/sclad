@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Package, Plus, Search } from 'lucide-react'
+import { Package, Package2, Plus, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { ItemFormModal } from '@/components/items/ItemFormModal'
@@ -203,7 +203,9 @@ export function ItemsPage() {
                   {item.image_url ? (
                     <img src={item.image_url} alt={item.name} className="h-14 w-14 shrink-0 rounded-md object-cover" />
                   ) : (
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] text-muted-foreground">N/A</div>
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                      <Package2 className="h-6 w-6" />
+                    </div>
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
@@ -245,7 +247,9 @@ export function ItemsPage() {
                       {item.image_url ? (
                         <img src={item.image_url} alt={item.name} className="h-10 w-10 rounded object-cover" />
                       ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded bg-muted text-[10px] text-muted-foreground">N/A</div>
+                        <div className="flex h-10 w-10 items-center justify-center rounded bg-muted text-muted-foreground">
+                          <Package2 className="h-4 w-4" />
+                        </div>
                       )}
                     </TableCell>
                     <TableCell className="whitespace-normal break-words">

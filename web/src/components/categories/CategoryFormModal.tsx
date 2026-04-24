@@ -15,7 +15,11 @@ import { useViewportHeight } from '@/hooks/useViewportHeight'
 import { useUpsertCategoryMutation, type CategoryRow } from '@/hooks/useCategories'
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Название обязательно'),
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Минимум 2 символа')
+    .refine((value) => /[^\d\s]/.test(value), 'Название не может состоять только из цифр'),
   description: z.string().optional(),
 })
 
