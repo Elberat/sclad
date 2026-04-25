@@ -151,7 +151,7 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
               onFocus={scrollFieldIntoView}
             />
             {form.formState.errors.name ? (
-              <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+              <p className="error-banner text-xs">
                 {form.formState.errors.name.message}
               </p>
             ) : null}
@@ -178,7 +178,7 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
               )}
             />
             {form.formState.errors.category_id ? (
-              <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+              <p className="error-banner text-xs">
                 {form.formState.errors.category_id.message}
               </p>
             ) : null}

@@ -7,9 +7,9 @@ import { usePermission } from '@/lib/permissions'
 type OperationType = 'receipt' | 'sale' | 'transfer'
 
 const OPERATION_LABELS: Record<OperationType, string> = {
-  receipt: 'РџСЂРёС…РѕРґ',
-  sale: 'Р Р°СЃС…РѕРґ',
-  transfer: 'РџРµСЂРµРјРµС‰РµРЅРёРµ',
+  receipt: 'Приход',
+  sale: 'Расход',
+  transfer: 'Перемещение',
 }
 
 const OPERATION_PERMISSIONS: Record<OperationType, string> = {
@@ -33,7 +33,7 @@ export function OperationPage() {
 
   return (
     <div className="page-shell gap-3">
-      <PageHeader title={OPERATION_LABELS[type]} description="Р’С‹Р±РµСЂРёС‚Рµ С‚РѕРІР°СЂ, СЃРєР»Р°Рґ Рё РєРѕР»РёС‡РµСЃС‚РІРѕ РґР»СЏ РѕРїРµСЂР°С†РёРё." />
+      <PageHeader title={OPERATION_LABELS[type]} description="Выберите товар, склад и количество для операции." />
       <OperationDrawer type={type} isOpen onClose={() => navigate('/dashboard')} />
     </div>
   )

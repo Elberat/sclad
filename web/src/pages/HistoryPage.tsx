@@ -18,6 +18,7 @@ import { useItemsQuery } from '@/hooks/useItems'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { useWarehousesQuery } from '@/hooks/useWarehouses'
 import { supabase } from '@/lib/supabase'
+import { getOperationBadgeClassName } from '@/lib/utils'
 
 const PAGE_SIZE = 50
 type OperationType = 'receipt' | 'sale' | 'transfer'
@@ -39,12 +40,6 @@ function operationTypeLabel(type: OperationType) {
   if (type === 'receipt') return 'Приход'
   if (type === 'sale') return 'Расход'
   return 'Перемещение'
-}
-
-function operationBadgeClassName(type: OperationType) {
-  if (type === 'receipt') return 'rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'
-  if (type === 'sale') return 'rounded-md bg-rose-50 px-2 py-1 text-rose-700'
-  return 'rounded-md bg-blue-50 px-2 py-1 text-blue-700'
 }
 
 function formatDateTime(value: string) {
@@ -174,12 +169,12 @@ export function HistoryPage() {
 
           <div className="space-y-2">
             <Label>Товар</Label>
-            <Select value={itemId || 'all'} onValueChange={(value) => updateFilter('itemId', value === 'all' ? '' : value)} >
+            <Select value={itemId || 'all'} onValueChange={(value) => updateFilter('itemId', value === 'all' ? '' : value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Все товары" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-              <SelectItem value="all">Все товары</SelectItem>
+                <SelectItem value="all">Все товары</SelectItem>
                 {(itemsQuery.data ?? [])
                   .filter((item) => item.is_active)
                   .map((item) => (
@@ -240,8 +235,11 @@ export function HistoryPage() {
               <div key={operation.id} className="surface-card p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-                    <Link to={operation.item_id ? `/items/${operation.item_id}` : '/items'} className="mt-2 block break-words font-medium underline">
+                    <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                    <Link
+                      to={operation.item_id ? `/items/${operation.item_id}` : '/items'}
+                      className="mt-2 block break-words font-medium underline decoration-border underline-offset-4 hover:text-primary"
+                    >
                       {operation.items?.name ?? '-'}
                     </Link>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -253,7 +251,7 @@ export function HistoryPage() {
                     <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
                   </div>
                 </div>
-                <div className="mt-3 grid gap-2 border-t pt-3 text-xs text-muted-foreground">
+                <div className="mt-3 grid gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
                   <p>
                     <span className="font-medium text-foreground">Маршрут: </span>
                     {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
@@ -271,7 +269,7 @@ export function HistoryPage() {
             ))}
           </div>
 
-          <div className="hidden overflow-hidden rounded-md border md:block">
+          <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border md:block">
             <Table className="w-full table-fixed md:table-auto">
               <TableHeader>
                 <TableRow className="bg-muted/50">
@@ -288,13 +286,16 @@ export function HistoryPage() {
                 {(operationsQuery.data?.rows ?? []).map((operation) => (
                   <TableRow key={operation.id}>
                     <TableCell className="hidden md:table-cell">
-                      <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                      <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                     </TableCell>
                     <TableCell className="whitespace-normal break-words">
                       <div className="mb-1 md:hidden">
-                        <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                        <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                       </div>
-                      <Link to={operation.item_id ? `/items/${operation.item_id}` : '/items'} className="block font-medium underline">
+                      <Link
+                        to={operation.item_id ? `/items/${operation.item_id}` : '/items'}
+                        className="block font-medium underline decoration-border underline-offset-4 hover:text-primary"
+                      >
                         {operation.items?.name ?? '-'}
                       </Link>
                       <p className="text-xs text-muted-foreground">

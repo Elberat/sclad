@@ -20,7 +20,13 @@ import {
   useWarehouseOperationsQuery,
   type WarehouseOperation,
 } from '@/hooks/useWarehouses'
-import { createArchiveActionClassName, createEditActionClassName } from '@/lib/utils'
+import {
+  createArchiveActionClassName,
+  createEditActionClassName,
+  getOperationActionClassName,
+  getOperationBadgeClassName,
+  getOperationIconClassName,
+} from '@/lib/utils'
 
 type OperationFilter = 'all' | 'receipt' | 'sale' | 'transfer'
 
@@ -192,34 +198,34 @@ export function WarehouseDetailsPage() {
               ))}
             </div>
 
-            <div className="hidden overflow-hidden rounded-md border md:block">
+            <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border md:block">
               <Table className="w-full table-fixed md:table-auto">
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="w-[58%] md:w-auto">Товар</TableHead>
-                  <TableHead className="hidden md:table-cell">Модель</TableHead>
-                  <TableHead className="hidden md:table-cell">SKU</TableHead>
-                  <TableHead className="hidden md:table-cell">Категория</TableHead>
-                  <TableHead className="w-[42%] text-right md:w-auto">Остаток</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems.map((balance) => (
-                  <TableRow key={balance.id}>
-                    <TableCell className="whitespace-normal break-words">
-                      <span className="font-medium">{balance.items?.name || 'Без названия'}</span>
-                      <div className="mt-1 space-y-0.5 text-xs text-muted-foreground md:hidden">
-                        <p>{balance.items?.model || '-'} / {balance.items?.sku || '-'}</p>
-                        <p>{balance.items?.item_categories?.name || '-'}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{balance.items?.model || '-'}</TableCell>
-                    <TableCell className="hidden md:table-cell">{balance.items?.sku || '-'}</TableCell>
-                    <TableCell className="hidden md:table-cell">{balance.items?.item_categories?.name || '-'}</TableCell>
-                    <TableCell className="text-right font-medium">{balance.quantity}</TableCell>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[58%] md:w-auto">Товар</TableHead>
+                    <TableHead className="hidden md:table-cell">Модель</TableHead>
+                    <TableHead className="hidden md:table-cell">SKU</TableHead>
+                    <TableHead className="hidden md:table-cell">Категория</TableHead>
+                    <TableHead className="w-[42%] text-right md:w-auto">Остаток</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
+                </TableHeader>
+                <TableBody>
+                  {filteredItems.map((balance) => (
+                    <TableRow key={balance.id}>
+                      <TableCell className="whitespace-normal break-words">
+                        <span className="font-medium">{balance.items?.name || 'Без названия'}</span>
+                        <div className="mt-1 space-y-0.5 text-xs text-muted-foreground md:hidden">
+                          <p>{balance.items?.model || '-'} / {balance.items?.sku || '-'}</p>
+                          <p>{balance.items?.item_categories?.name || '-'}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{balance.items?.model || '-'}</TableCell>
+                      <TableCell className="hidden md:table-cell">{balance.items?.sku || '-'}</TableCell>
+                      <TableCell className="hidden md:table-cell">{balance.items?.item_categories?.name || '-'}</TableCell>
+                      <TableCell className="text-right font-medium">{balance.quantity}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             </div>
           </div>
@@ -230,19 +236,19 @@ export function WarehouseDetailsPage() {
         <h2 className="text-lg font-semibold">Быстрые действия</h2>
         <div className="grid gap-2 sm:grid-cols-3">
           <RoleGate permission="canDoReceipt">
-            <Button variant="outline" size="sm" className={quickOperationButtonClassName('receipt')} onClick={() => setOperationType('receipt')}>
+            <Button variant="default" size="sm" className={getOperationActionClassName('receipt')} onClick={() => setOperationType('receipt')}>
               <TrendingUp className="size-4" />
               Приход
             </Button>
           </RoleGate>
           <RoleGate permission="canDoTransfer">
-            <Button variant="outline" size="sm" className={quickOperationButtonClassName('transfer')} onClick={() => setOperationType('transfer')}>
+            <Button variant="default" size="sm" className={getOperationActionClassName('transfer')} onClick={() => setOperationType('transfer')}>
               <ArrowRightLeft className="size-4" />
               Перемещение
             </Button>
           </RoleGate>
           <RoleGate permission="canDoSale">
-            <Button variant="outline" size="sm" className={quickOperationButtonClassName('sale')} onClick={() => setOperationType('sale')}>
+            <Button variant="default" size="sm" className={getOperationActionClassName('sale')} onClick={() => setOperationType('sale')}>
               <TrendingDown className="size-4" />
               Расход
             </Button>
@@ -311,21 +317,15 @@ function OperationFilterBadge({
 }
 
 function operationIcon(type: WarehouseOperation['type']) {
-  if (type === 'receipt') return <TrendingUp className="size-4 text-emerald-600" />
-  if (type === 'sale') return <TrendingDown className="size-4 text-rose-600" />
-  return <ArrowRightLeft className="size-4 text-blue-600" />
+  if (type === 'receipt') return <TrendingUp className={`size-4 ${getOperationIconClassName(type)}`} />
+  if (type === 'sale') return <TrendingDown className={`size-4 ${getOperationIconClassName(type)}`} />
+  return <ArrowRightLeft className={`size-4 ${getOperationIconClassName(type)}`} />
 }
 
 function operationTypeLabel(type: WarehouseOperation['type']) {
   if (type === 'receipt') return 'Приход'
   if (type === 'sale') return 'Расход'
   return 'Перемещение'
-}
-
-function operationBadgeClassName(type: WarehouseOperation['type']) {
-  if (type === 'receipt') return 'rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'
-  if (type === 'sale') return 'rounded-md bg-rose-50 px-2 py-1 text-rose-700'
-  return 'rounded-md bg-blue-50 px-2 py-1 text-blue-700'
 }
 
 function formatDateTime(value: string) {
@@ -337,12 +337,6 @@ function formatDateTime(value: string) {
   })
 }
 
-function quickOperationButtonClassName(type: WarehouseOperation['type']) {
-  if (type === 'receipt') return 'gap-2 border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800'
-  if (type === 'sale') return 'gap-2 border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800'
-  return 'gap-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800'
-}
-
 function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
   return (
     <div data-no-pull-refresh="true">
@@ -351,7 +345,7 @@ function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
           <div key={operation.id} className="surface-card p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                 <p className="mt-2 break-words font-medium leading-5">{operation.items?.name || 'Без товара'}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
               </div>
@@ -360,7 +354,7 @@ function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
                 <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
               </div>
             </div>
-            <p className="mt-3 border-t pt-3 text-xs text-muted-foreground">
+            <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">Время: </span>
               {formatDateTime(operation.created_at)}
             </p>
@@ -368,42 +362,42 @@ function OperationsTable({ operations }: { operations: WarehouseOperation[] }) {
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-md border md:block">
+      <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border md:block">
         <Table className="w-full table-fixed md:table-auto">
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="hidden md:table-cell">Тип</TableHead>
-            <TableHead className="w-[58%] md:w-auto">Операция</TableHead>
-            <TableHead className="w-[22%] text-right md:w-auto">Кол-во</TableHead>
-            <TableHead className="hidden md:table-cell">Пользователь</TableHead>
-            <TableHead className="w-[20%] md:hidden"> </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {operations.map((operation) => (
-            <TableRow key={operation.id}>
-              <TableCell className="hidden md:table-cell">
-                <span className="inline-flex items-center gap-2">
-                  {operationIcon(operation.type)}
-                  {operationTypeLabel(operation.type)}
-                </span>
-              </TableCell>
-              <TableCell className="whitespace-normal break-words">
-                <div className="mb-1 flex items-center gap-2 md:hidden">
-                  {operationIcon(operation.type)}
-                  <span className="text-xs font-medium uppercase tracking-wider">{operationTypeLabel(operation.type)}</span>
-                </div>
-                <span className="font-medium">{operation.items?.name || 'Без товара'}</span>
-                <p className="mt-1 text-xs text-muted-foreground md:hidden">
-                  {operation.profiles?.full_name || operation.profiles?.email || 'Система'}
-                </p>
-              </TableCell>
-              <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
-              <TableCell className="hidden md:table-cell">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
-              <TableCell className="md:hidden" />
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="hidden md:table-cell">Тип</TableHead>
+              <TableHead className="w-[58%] md:w-auto">Операция</TableHead>
+              <TableHead className="w-[22%] text-right md:w-auto">Кол-во</TableHead>
+              <TableHead className="hidden md:table-cell">Пользователь</TableHead>
+              <TableHead className="w-[20%] md:hidden"> </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
+          </TableHeader>
+          <TableBody>
+            {operations.map((operation) => (
+              <TableRow key={operation.id}>
+                <TableCell className="hidden md:table-cell">
+                  <span className="inline-flex items-center gap-2">
+                    {operationIcon(operation.type)}
+                    {operationTypeLabel(operation.type)}
+                  </span>
+                </TableCell>
+                <TableCell className="whitespace-normal break-words">
+                  <div className="mb-1 flex items-center gap-2 md:hidden">
+                    {operationIcon(operation.type)}
+                    <span className="text-xs font-medium uppercase tracking-wider">{operationTypeLabel(operation.type)}</span>
+                  </div>
+                  <span className="font-medium">{operation.items?.name || 'Без товара'}</span>
+                  <p className="mt-1 text-xs text-muted-foreground md:hidden">
+                    {operation.profiles?.full_name || operation.profiles?.email || 'Система'}
+                  </p>
+                </TableCell>
+                <TableCell className="text-right font-medium">{operation.quantity}</TableCell>
+                <TableCell className="hidden md:table-cell">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</TableCell>
+                <TableCell className="md:hidden" />
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
       </div>
     </div>

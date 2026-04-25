@@ -16,7 +16,7 @@ import { useItemsQuery } from '@/hooks/useItems'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useViewportBottomInset, useViewportHeight } from '@/hooks/useViewportHeight'
 import { useWarehousesQuery } from '@/hooks/useWarehouses'
-import { cn } from '@/lib/utils'
+import { cn, createOperationSubmitActionClassName } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
 type OperationType = 'receipt' | 'sale' | 'transfer'
@@ -49,9 +49,7 @@ const ACTION_TITLES: Record<OperationType, string> = {
 }
 
 function operationSubmitClassName(type: OperationType) {
-  if (type === 'receipt') return 'min-h-[48px] w-full bg-emerald-600 text-white hover:bg-emerald-700'
-  if (type === 'sale') return 'min-h-[48px] w-full bg-rose-600 text-white hover:bg-rose-700'
-  return 'min-h-[48px] w-full bg-blue-600 text-white hover:bg-blue-700'
+  return createOperationSubmitActionClassName(type, 'min-h-[48px] w-full')
 }
 
 const itemQuantitySchema = z.object({
@@ -144,7 +142,7 @@ function DrawerFooter({
 }) {
   return (
     <div className="sticky bottom-0 mt-auto border-t bg-background/95 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-5 lg:px-6">
-      {error ? <p className="mb-3 text-sm text-destructive">{error}</p> : null}
+      {error ? <p className="error-banner mb-3">{error}</p> : null}
       <div className="grid grid-cols-2 gap-3">
         <Button type="button" variant="outline" className="min-h-[48px]" onClick={onCancel}>
           Отмена
@@ -488,7 +486,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                     )}
                   />
                   {receiptForm.formState.errors.warehouse_id ? (
-                    <p className="text-xs text-destructive">{receiptForm.formState.errors.warehouse_id.message}</p>
+                    <p className="field-error">{receiptForm.formState.errors.warehouse_id.message}</p>
                   ) : null}
                 </div>
 
@@ -510,7 +508,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                             )}
                           />
                           {receiptForm.formState.errors.items?.[index]?.item_id ? (
-                            <p className="text-xs text-destructive">{receiptForm.formState.errors.items[index]?.item_id?.message}</p>
+                            <p className="field-error">{receiptForm.formState.errors.items[index]?.item_id?.message}</p>
                           ) : null}
                         </>
                       ) : null}
@@ -525,7 +523,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                             {...receiptForm.register(`items.${index}.quantity`, { valueAsNumber: true })}
                           />
                           {receiptForm.formState.errors.items?.[index]?.quantity ? (
-                            <p className="text-xs text-destructive">{receiptForm.formState.errors.items[index]?.quantity?.message}</p>
+                            <p className="field-error">{receiptForm.formState.errors.items[index]?.quantity?.message}</p>
                           ) : null}
                         </div>
 
@@ -551,7 +549,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                   ) : null}
 
                   {typeof receiptForm.formState.errors.items?.message === 'string' ? (
-                    <p className="text-xs text-destructive">{receiptForm.formState.errors.items.message}</p>
+                    <p className="field-error">{receiptForm.formState.errors.items.message}</p>
                   ) : null}
                 </div>
               </div>
@@ -591,7 +589,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                       )}
                     />
                     {saleForm.formState.errors.warehouse_id ? (
-                      <p className="text-xs text-destructive">{saleForm.formState.errors.warehouse_id.message}</p>
+                      <p className="field-error">{saleForm.formState.errors.warehouse_id.message}</p>
                     ) : null}
                   </div>
 
@@ -612,7 +610,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                         )}
                       />
                       {saleForm.formState.errors.item_id ? (
-                        <p className="text-xs text-destructive">{saleForm.formState.errors.item_id.message}</p>
+                        <p className="field-error">{saleForm.formState.errors.item_id.message}</p>
                       ) : null}
                       {saleWarehouseId && saleItemId ? <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p> : null}
                     </div>
@@ -631,7 +629,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                       })}
                     />
                     {saleForm.formState.errors.quantity ? (
-                      <p className="text-xs text-destructive">{saleForm.formState.errors.quantity.message}</p>
+                      <p className="field-error">{saleForm.formState.errors.quantity.message}</p>
                     ) : null}
                     {hasFixedItem && saleWarehouseId && saleItemId ? <p className="text-xs text-muted-foreground">В наличии: {availableSaleBalance} шт</p> : null}
                   </div>
@@ -673,7 +671,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                       )}
                     />
                     {transferForm.formState.errors.source_warehouse_id ? (
-                      <p className="text-xs text-destructive">{transferForm.formState.errors.source_warehouse_id.message}</p>
+                      <p className="field-error">{transferForm.formState.errors.source_warehouse_id.message}</p>
                     ) : null}
                   </div>
 
@@ -700,7 +698,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                       )}
                     />
                     {transferForm.formState.errors.destination_warehouse_id ? (
-                      <p className="text-xs text-destructive">{transferForm.formState.errors.destination_warehouse_id.message}</p>
+                      <p className="field-error">{transferForm.formState.errors.destination_warehouse_id.message}</p>
                     ) : null}
                   </div>
 
@@ -721,7 +719,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                         )}
                       />
                       {transferForm.formState.errors.item_id ? (
-                        <p className="text-xs text-destructive">{transferForm.formState.errors.item_id.message}</p>
+                        <p className="field-error">{transferForm.formState.errors.item_id.message}</p>
                       ) : null}
                       {transferSourceWarehouseId && transferItemId ? (
                         <p className="text-xs text-muted-foreground">В наличии: {availableTransferBalance} шт</p>
@@ -742,7 +740,7 @@ export function OperationDrawer({ type, defaultWarehouseId, defaultItemId, isOpe
                       })}
                     />
                     {transferForm.formState.errors.quantity ? (
-                      <p className="text-xs text-destructive">{transferForm.formState.errors.quantity.message}</p>
+                      <p className="field-error">{transferForm.formState.errors.quantity.message}</p>
                     ) : null}
                     {hasFixedItem && transferSourceWarehouseId && transferItemId ? (
                       <p className="text-xs text-muted-foreground">В наличии: {availableTransferBalance} шт</p>

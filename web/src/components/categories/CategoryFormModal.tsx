@@ -78,7 +78,7 @@ export function CategoryFormModal({ open, onOpenChange, category }: CategoryForm
             onFocus={scrollFieldIntoView}
           />
           {form.formState.errors.name ? (
-            <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-medium text-destructive">
+            <p className="error-banner text-xs">
               {form.formState.errors.name.message}
             </p>
           ) : null}

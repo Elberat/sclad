@@ -20,7 +20,13 @@ import {
   useItemOperationsQuery,
   type ItemOperation,
 } from '@/hooks/useItems'
-import { createArchiveActionClassName, createEditActionClassName } from '@/lib/utils'
+import {
+  createArchiveActionClassName,
+  createEditActionClassName,
+  getOperationActionClassName,
+  getOperationBadgeClassName,
+  getOperationIconClassName,
+} from '@/lib/utils'
 
 export function ItemDetailsPage() {
   const { id } = useParams<{ id: string }>()
@@ -49,18 +55,16 @@ export function ItemDetailsPage() {
           <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-start">
             <div className="flex min-w-0 gap-4">
               {item.image_url ? (
-                <img src={item.image_url} alt={item.name} className="h-24 w-24 shrink-0 rounded-md object-cover md:h-28 md:w-28" />
+                <img src={item.image_url} alt={item.name} className="h-24 w-24 shrink-0 rounded-xl object-cover md:h-28 md:w-28" />
               ) : (
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-md bg-muted text-xs text-muted-foreground md:h-28 md:w-28">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-muted text-xs text-muted-foreground md:h-28 md:w-28">
                   Нет фото
                 </div>
               )}
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <CardTitle className="break-words">{item.name}</CardTitle>
-                  <Badge variant={item.is_active ? 'default' : 'secondary'} className={item.is_active ? 'text-emerald-700' : undefined}>
-                    {item.is_active ? 'Активный' : 'Архивный'}
-                  </Badge>
+                  <Badge variant={item.is_active ? 'default' : 'secondary'}>{item.is_active ? 'Активный' : 'Архивный'}</Badge>
                 </div>
                 <CardDescription>
                   {item.model || '-'} / {item.sku || '-'}
@@ -117,7 +121,7 @@ export function ItemDetailsPage() {
                   </div>
                 </div>
               ))}
-              <div className="surface-card bg-muted/40 p-5">
+              <div className="surface-card bg-muted/50 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-semibold">Итого</p>
                   <p className="text-lg font-semibold tabular-nums">{totalQuantity} шт</p>
@@ -125,7 +129,7 @@ export function ItemDetailsPage() {
               </div>
             </div>
 
-            <div className="hidden overflow-hidden rounded-md border md:block">
+            <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -155,19 +159,19 @@ export function ItemDetailsPage() {
         <h2 className="text-lg font-semibold">Быстрые действия</h2>
         <div className="grid gap-2 sm:grid-cols-3">
           <RoleGate permission="canDoReceipt">
-            <Button variant="outline" className={quickOperationButtonClassName('receipt')} onClick={() => setOperationType('receipt')}>
+            <Button variant="default" className={getOperationActionClassName('receipt')} onClick={() => setOperationType('receipt')}>
               <TrendingUp className="size-4" />
               Приход
             </Button>
           </RoleGate>
           <RoleGate permission="canDoTransfer">
-            <Button variant="outline" className={quickOperationButtonClassName('transfer')} onClick={() => setOperationType('transfer')}>
+            <Button variant="default" className={getOperationActionClassName('transfer')} onClick={() => setOperationType('transfer')}>
               <ArrowRightLeft className="size-4" />
               Перемещение
             </Button>
           </RoleGate>
           <RoleGate permission="canDoSale">
-            <Button variant="outline" className={quickOperationButtonClassName('sale')} onClick={() => setOperationType('sale')}>
+            <Button variant="default" className={getOperationActionClassName('sale')} onClick={() => setOperationType('sale')}>
               <TrendingDown className="size-4" />
               Расход
             </Button>
@@ -199,7 +203,7 @@ export function ItemDetailsPage() {
                 <div key={operation.id} className="surface-card p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                      <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                       <p className="mt-2 text-xs text-muted-foreground">{operation.profiles?.full_name || operation.profiles?.email || 'Система'}</p>
                     </div>
                     <div className="text-right">
@@ -207,7 +211,7 @@ export function ItemDetailsPage() {
                       <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
                     </div>
                   </div>
-                  <p className="mt-3 border-t pt-3 text-xs text-muted-foreground">
+                  <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
                     <span className="font-medium text-foreground">Время: </span>
                     {formatDateTime(operation.created_at)}
                   </p>
@@ -215,7 +219,7 @@ export function ItemDetailsPage() {
               ))}
             </div>
 
-            <div className="hidden overflow-hidden rounded-md border md:block">
+            <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -248,21 +252,15 @@ export function ItemDetailsPage() {
 }
 
 function operationIcon(type: ItemOperation['type']) {
-  if (type === 'receipt') return <TrendingUp className="size-4 text-emerald-600" />
-  if (type === 'sale') return <TrendingDown className="size-4 text-rose-600" />
-  return <ArrowRightLeft className="size-4 text-blue-600" />
+  if (type === 'receipt') return <TrendingUp className={`size-4 ${getOperationIconClassName(type)}`} />
+  if (type === 'sale') return <TrendingDown className={`size-4 ${getOperationIconClassName(type)}`} />
+  return <ArrowRightLeft className={`size-4 ${getOperationIconClassName(type)}`} />
 }
 
 function operationTypeLabel(type: ItemOperation['type']) {
   if (type === 'receipt') return 'Приход'
   if (type === 'sale') return 'Расход'
   return 'Перемещение'
-}
-
-function operationBadgeClassName(type: ItemOperation['type']) {
-  if (type === 'receipt') return 'rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'
-  if (type === 'sale') return 'rounded-md bg-rose-50 px-2 py-1 text-rose-700'
-  return 'rounded-md bg-blue-50 px-2 py-1 text-blue-700'
 }
 
 function formatDateTime(value: string) {
@@ -272,12 +270,6 @@ function formatDateTime(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   })
-}
-
-function quickOperationButtonClassName(type: ItemOperation['type']) {
-  if (type === 'receipt') return 'gap-2 border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800'
-  if (type === 'sale') return 'gap-2 border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800'
-  return 'gap-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800'
 }
 
 function MetricTile({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'muted' }) {

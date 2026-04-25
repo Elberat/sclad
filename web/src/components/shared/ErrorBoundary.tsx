@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-        <div className="rounded-full bg-destructive/10 p-4 text-destructive">
+        <div className="rounded-full bg-[color:var(--surface-danger)] p-4 text-destructive">
           <AlertTriangle className="size-8" />
         </div>
         <div className="space-y-1">

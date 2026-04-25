@@ -18,6 +18,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { InstallAppButton } from '@/components/shared/InstallAppButton'
 import { RoleGate } from '@/components/shared/RoleGate'
 import { TableSkeleton } from '@/components/shared/TableSkeleton'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +33,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useAuth } from '@/contexts/AuthContext'
 import { PERMISSIONS } from '@/lib/permissions'
 import { supabase } from '@/lib/supabase'
+import { getOperationActionClassName, getOperationBadgeClassName } from '@/lib/utils'
 
 type OperationType = 'receipt' | 'sale' | 'transfer'
 
@@ -50,12 +52,6 @@ function operationTypeLabel(type: OperationType) {
   if (type === 'receipt') return 'Приход'
   if (type === 'sale') return 'Расход'
   return 'Перемещение'
-}
-
-function operationBadgeClassName(type: OperationType) {
-  if (type === 'receipt') return 'rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'
-  if (type === 'sale') return 'rounded-md bg-rose-50 px-2 py-1 text-rose-700'
-  return 'rounded-md bg-blue-50 px-2 py-1 text-blue-700'
 }
 
 function formatDateTime(value: string) {
@@ -121,11 +117,11 @@ export function DashboardPage() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Дашборд</h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-input bg-background text-foreground shadow-[var(--shadow-sm)] transition-colors outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20">
+          <DropdownMenuTrigger className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-input bg-background text-foreground shadow-[var(--shadow-sm)] transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20">
             <EllipsisVertical className="h-4 w-4" />
             <span className="sr-only">Открыть меню пользователя</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuContent align="end" className="w-72">
             <DropdownMenuLabel className="normal-case tracking-normal text-foreground">
               <div className="space-y-0.5">
                 <p className="truncate text-sm font-semibold">{profile?.full_name || profile?.email || 'Пользователь'}</p>
@@ -133,14 +129,18 @@ export function DashboardPage() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <InstallAppButton variant="ghost" className="w-full justify-start rounded-lg px-3" compact />
+            <div className="px-2 py-1">
+              <ThemeToggle />
+            </div>
+            <DropdownMenuSeparator />
+            <InstallAppButton variant="ghost" className="w-full justify-start rounded-xl px-3" compact />
             {canManageUsers ? (
               <DropdownMenuItem onClick={() => navigate('/users')} className="normal-case text-sm tracking-normal">
                 <Users className="h-4 w-4" />
                 Пользователи
               </DropdownMenuItem>
             ) : null}
-            <DropdownMenuItem onClick={() => void handleSignOut()} className="normal-case text-sm tracking-normal text-rose-600 focus:text-rose-700">
+            <DropdownMenuItem onClick={() => void handleSignOut()} variant="destructive" className="normal-case text-sm tracking-normal">
               <LogOut className="h-4 w-4" />
               Выйти
             </DropdownMenuItem>
@@ -194,7 +194,7 @@ export function DashboardPage() {
               ))}
             </div>
 
-            <div className="hidden overflow-hidden rounded-md border 2xl:block">
+            <div className="hidden overflow-hidden rounded-[calc(var(--radius)-0.125rem)] border border-border 2xl:block">
               <Table className="w-full table-auto">
                 <TableHeader>
                   <TableRow className="bg-muted/50">
@@ -211,10 +211,10 @@ export function DashboardPage() {
                   {(dashboardQuery.data?.latestOperations ?? []).map((operation) => (
                     <TableRow key={operation.id}>
                       <TableCell>
-                        <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+                        <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
                       </TableCell>
                       <TableCell className="whitespace-normal break-words">
-                        <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="block font-medium underline">
+                        <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="block font-medium underline decoration-border underline-offset-4 hover:text-primary">
                           {operation.items?.name ?? '-'}
                         </Link>
                         <p className="text-xs text-muted-foreground">
@@ -243,8 +243,11 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
     <div className="surface-card p-5">
       <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
         <div className="min-w-0">
-          <Badge className={operationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
-          <Link to={operation.items ? `/items/${operation.items.id}` : '/items'} className="mt-2 block break-words font-medium underline">
+          <Badge className={getOperationBadgeClassName(operation.type)}>{operationTypeLabel(operation.type)}</Badge>
+          <Link
+            to={operation.items ? `/items/${operation.items.id}` : '/items'}
+            className="mt-2 block break-words font-medium underline decoration-border underline-offset-4 hover:text-primary"
+          >
             {operation.items?.name ?? '-'}
           </Link>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -256,7 +259,7 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
           <p className="text-lg font-semibold tabular-nums">{operation.quantity}</p>
         </div>
       </div>
-      <div className="mt-3 grid gap-2 border-t pt-3 text-xs text-muted-foreground min-[720px]:grid-cols-2">
+      <div className="mt-3 grid gap-2 border-t border-border pt-3 text-xs text-muted-foreground min-[720px]:grid-cols-2">
         <p>
           <span className="font-medium text-foreground">Маршрут: </span>
           {operation.source_warehouse?.name ?? '-'} {'->'} {operation.destination_warehouse?.name ?? '-'}
@@ -268,17 +271,10 @@ function OperationCard({ operation }: { operation: DashboardOperation }) {
         <p className="min-[720px]:col-span-2">
           <span className="font-medium text-foreground">Время: </span>
           {formatDateTime(operation.created_at)}
-          
         </p>
       </div>
     </div>
   )
-}
-
-function quickOperationClassName(type: OperationType) {
-  if (type === 'receipt') return 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800'
-  if (type === 'sale') return 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800'
-  return 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800'
 }
 
 function OperationLink({
@@ -293,11 +289,7 @@ function OperationLink({
   label: string
 }) {
   return (
-    <Button
-      asChild
-      variant="outline"
-      className={`h-auto min-h-11 w-full justify-start gap-2 px-4 py-3 text-left whitespace-normal ${quickOperationClassName(type)}`}
-    >
+    <Button asChild variant="default" className={`h-auto min-h-11 w-full justify-start px-4 py-3 text-left whitespace-normal ${getOperationActionClassName(type)}`}>
       <Link to={to}>
         <Icon className="h-4 w-4 shrink-0" />
         <span className="truncate">{label}</span>
@@ -318,8 +310,8 @@ function MetricStat({
   icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 border-b border-border/80 px-4 py-4 last:border-b-0 min-[360px]:border-r min-[360px]:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(4)]:border-r-0">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
+    <div className="flex min-w-0 items-center gap-3 border-b border-border px-4 py-4 last:border-b-0 min-[360px]:border-r min-[360px]:even:border-r-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(4)]:border-r-0">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--surface-strong)] text-primary">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">

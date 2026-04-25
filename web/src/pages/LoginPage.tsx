@@ -65,7 +65,7 @@ export function LoginPage() {
         </CardHeader>
         <CardContent>
           {!isSupabaseConfigured ? (
-            <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            <div className="error-banner mb-4">
               Добавьте `.env` в папку `web` с `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY`, затем перезапустите dev server.
             </div>
           ) : null}
@@ -74,7 +74,7 @@ export function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" autoComplete="email" inputMode="email" {...form.register('email')} />
-              {form.formState.errors.email ? <p className="text-xs text-destructive">{form.formState.errors.email.message}</p> : null}
+              {form.formState.errors.email ? <p className="field-error">{form.formState.errors.email.message}</p> : null}
             </div>
 
             <div className="space-y-2">
@@ -98,10 +98,10 @@ export function LoginPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {form.formState.errors.password ? <p className="text-xs text-destructive">{form.formState.errors.password.message}</p> : null}
+              {form.formState.errors.password ? <p className="field-error">{form.formState.errors.password.message}</p> : null}
             </div>
 
-            {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
+            {formError ? <p className="error-banner">{formError}</p> : null}
 
             <Button type="submit" className="min-h-[48px] w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? 'Входим...' : 'Войти'}

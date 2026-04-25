@@ -5,9 +5,9 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-emerald-200 bg-emerald-50 text-emerald-700 [a]:hover:text-emerald-800',
-        secondary: 'border-border bg-muted text-muted-foreground [a]:hover:text-foreground',
-        destructive: 'border-rose-200 bg-rose-50 text-rose-700 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:text-rose-800',
+        default: 'status-badge--active [a]:hover:text-[color:var(--success)]',
+        secondary: 'status-badge--muted [a]:hover:text-foreground',
+        destructive: 'border-transparent bg-[color:var(--surface-danger)] text-[color:var(--danger)] focus-visible:ring-destructive/20 [a]:hover:text-[color:var(--danger)]',
         outline: 'border-border bg-background text-foreground [a]:hover:text-foreground/70',
         ghost: 'border-transparent bg-transparent text-muted-foreground hover:text-foreground',
         link: 'text-foreground underline-offset-4 hover:underline',

@@ -185,7 +185,7 @@ export function CategoriesPage() {
 
 function StatusBadge({ isActive }: { isActive: boolean }) {
   return (
-    <Badge variant={isActive ? 'default' : 'secondary'} className={isActive ? 'text-emerald-700' : undefined}>
+    <Badge variant={isActive ? 'default' : 'secondary'}>
       {isActive ? 'Активная' : 'Архивная'}
     </Badge>
   )
