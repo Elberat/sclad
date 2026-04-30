@@ -60,15 +60,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
-      <aside className="hidden border-r border-border bg-card/95 md:flex md:flex-col">
-        <div className="border-b border-border px-5 py-4 text-base font-semibold tracking-tight">Sclad</div>
+    <div className="min-h-dvh md:h-dvh md:overflow-hidden">
+      <aside className="hidden border-r border-border bg-card/95 md:fixed md:inset-y-0 md:left-0 md:flex md:w-[248px] md:flex-col md:overflow-hidden">
+        <div className="flex h-full flex-col">
+          <div className="border-b border-border px-5 py-4 text-base font-semibold tracking-tight">Sclad</div>
         <nav className="flex-1 space-y-1.5 px-3 py-4">
           {permittedNavItems.map((item) => (
             <NavItemLink key={item.path} item={item} />
           ))}
         </nav>
-        <div className="space-y-4 border-t border-border px-4 py-4">
+        <div className="mt-auto space-y-4 border-t border-border px-4 py-4">
           <div className="text-sm">
             <p className="font-medium">{profile?.full_name || profile?.email || 'Пользователь'}</p>
             <p className="text-xs text-muted-foreground">{profile?.role}</p>
@@ -79,9 +80,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             Выйти
           </Button>
         </div>
+        </div>
       </aside>
 
-      <main className="pb-[calc(84px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
+      <main className="min-w-0 pb-[calc(84px+env(safe-area-inset-bottom))] md:ml-[248px] md:h-dvh md:overflow-y-auto md:pb-0">
+        {children}
+      </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur md:hidden">
         <div

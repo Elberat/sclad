@@ -83,6 +83,7 @@ export function useWarehouseBalancesQuery(id: string | undefined) {
         .from('inventory_balances')
         .select('id, quantity, item_id, items(id, name, model, sku, item_categories(name))')
         .eq('warehouse_id', id!)
+        .gt('quantity', 0)
         .order('updated_at', { ascending: false })
       if (error) throw error
       return (data ?? []) as WarehouseItemBalance[]

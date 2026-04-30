@@ -11,19 +11,28 @@ function isStandaloneMode() {
   return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true
 }
 
+function isIosDevice() {
+  if (typeof window === 'undefined') return false
+
+  const { userAgent, platform, maxTouchPoints } = window.navigator
+
+  return /iPad|iPhone|iPod/.test(userAgent) || (platform === 'MacIntel' && maxTouchPoints > 1)
+}
+
 export function usePwaInstall() {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(isStandaloneMode)
+  const [isIos] = useState(isIosDevice)
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault()
-      setInstallPrompt(event as BeforeInstallPromptEvent)
+      setDeferredPrompt(event as BeforeInstallPromptEvent)
     }
 
     const handleAppInstalled = () => {
       setIsInstalled(true)
-      setInstallPrompt(null)
+      setDeferredPrompt(null)
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -35,24 +44,23 @@ export function usePwaInstall() {
     }
   }, [])
 
-  const canInstall = useMemo(() => Boolean(installPrompt) && !isInstalled, [installPrompt, isInstalled])
+  const canInstall = useMemo(() => Boolean(deferredPrompt) && !isInstalled, [deferredPrompt, isInstalled])
 
   const promptInstall = async () => {
-    if (!installPrompt) return { outcome: 'dismissed' as const }
+    if (!deferredPrompt) return { outcome: 'dismissed' as const, platform: 'unknown' }
 
-    await installPrompt.prompt()
-    const choice = await installPrompt.userChoice
-
-    if (choice.outcome === 'accepted') {
-      setInstallPrompt(null)
-    }
+    await deferredPrompt.prompt()
+    const choice = await deferredPrompt.userChoice
+    setDeferredPrompt(null)
 
     return choice
   }
 
   return {
     canInstall,
+    deferredPrompt,
     isInstalled,
+    isIos,
     promptInstall,
   }
 }

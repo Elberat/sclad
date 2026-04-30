@@ -79,10 +79,14 @@ export function ItemFormModal({ open, onOpenChange, item }: ItemFormModalProps) 
       purchase_price: item?.purchase_price ?? '',
       sale_price: item?.sale_price ?? '',
     })
-    setUploadedPhoto({
-      key: itemImageKey,
-      url: item?.image_url ?? null,
-    })
+    const resetUploadedPhoto = window.setTimeout(() => {
+      setUploadedPhoto({
+        key: itemImageKey,
+        url: item?.image_url ?? null,
+      })
+    }, 0)
+
+    return () => window.clearTimeout(resetUploadedPhoto)
   }, [form, item, itemImageKey, open])
 
   const uploadPhoto = async (file: File) => {

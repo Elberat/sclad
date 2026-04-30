@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
 import { PageHeader } from '@/components/shared/PageHeader'
 import { OperationDrawer } from '@/components/warehouses/OperationDrawer'
@@ -10,6 +10,12 @@ const OPERATION_LABELS: Record<OperationType, string> = {
   receipt: 'Приход',
   sale: 'Расход',
   transfer: 'Перемещение',
+}
+
+const OPERATION_DESCRIPTIONS: Record<OperationType, string> = {
+  receipt: 'Добавьте товары, которые приехали на склад.',
+  sale: 'Выберите товар, который нужно списать со склада.',
+  transfer: 'Переместите товар с одного склада на другой.',
 }
 
 const OPERATION_PERMISSIONS: Record<OperationType, string> = {
@@ -25,6 +31,7 @@ function isOperationType(value: string | undefined): value is OperationType {
 export function OperationPage() {
   const { type } = useParams<{ type: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const canUseOperation = usePermission(isOperationType(type) ? OPERATION_PERMISSIONS[type] : '')
 
   if (!isOperationType(type) || !canUseOperation) {
@@ -33,8 +40,8 @@ export function OperationPage() {
 
   return (
     <div className="page-shell gap-3">
-      <PageHeader title={OPERATION_LABELS[type]} description="Выберите товар, склад и количество для операции." />
-      <OperationDrawer type={type} isOpen onClose={() => navigate('/dashboard')} />
+      <PageHeader title={OPERATION_LABELS[type]} description={OPERATION_DESCRIPTIONS[type]} />
+      <OperationDrawer type={type} defaultWarehouseId={searchParams.get('warehouse') ?? undefined} isOpen onClose={() => navigate('/dashboard')} />
     </div>
   )
 }

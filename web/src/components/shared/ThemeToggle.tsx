@@ -1,6 +1,5 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -10,13 +9,7 @@ type ThemeToggleProps = {
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const activeTheme = mounted ? resolvedTheme ?? 'light' : 'light'
+  const activeTheme = resolvedTheme ?? 'light'
 
   return (
     <div className={cn('space-y-2', className)}>
